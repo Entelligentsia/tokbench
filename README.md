@@ -9,20 +9,28 @@ software engineering workload — and at what cost?
 
 **Answer (pilot, N=1 per arm — replication runs in progress, see [PROTOCOL](bench/PROTOCOL.md)):**
 
-```mermaid
-xychart-beta
-    title "Provider-billed input tokens — same task, same harness, same models"
-    x-axis ["native (none)", "rtk 0.42", "headroom 0.23", "lean-ctx 3.7 (MCP)", "lean-ctx 3.7 (default)"]
-    y-axis "Million input tokens (billed)" 0 --> 4
-    bar [2.28, 2.89, 3.24, 3.14, 3.62]
+```text
+Provider-billed input tokens — same task, same harness, same models
+
+native (none)           ██████████████████████              2.28M
+rtk 0.42                ████████████████████████████        2.89M   +27%
+lean-ctx 3.7 (MCP)      ██████████████████████████████      3.14M   +38%
+headroom 0.23           ███████████████████████████████     3.24M   +43%*
+lean-ctx 3.7 (default)  ███████████████████████████████████ 3.62M   +59%
+
+* headroom's wire counterfactual: it removed 342K tokens the run would
+  otherwise have billed (−9.5%) — the only genuine saving measured.
+  The +43% headline is run-path variance, not the proxy. See below.
 ```
 
-```mermaid
-xychart-beta
-    title "Latency — seconds of model time per request turn"
-    x-axis ["native (none)", "headroom", "rtk", "lean-ctx (MCP)", "lean-ctx (default)"]
-    y-axis "sec / turn" 0 --> 7
-    bar [2.8, 3.7, 4.2, 4.2, 6.8]
+```text
+Latency — seconds of model time per request turn
+
+native (none)           ███████████                         2.8
+headroom 0.23           ███████████████                     3.7
+rtk 0.42                █████████████████                   4.2
+lean-ctx 3.7 (MCP)      █████████████████                   4.2
+lean-ctx 3.7 (default)  ███████████████████████████         6.8
 ```
 
 ### The three meters never agree — that's the finding
