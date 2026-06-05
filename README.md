@@ -173,6 +173,20 @@ docker run -it --rm \
 
 No pre-rendered recordings needed — the data *is* the footage.
 
+## Vendor review (open)
+
+Before publication (planned **June 17, 2026**), we filed review requests with all
+three maintainers — each links this repo, asks whether our integration is faithful
+to how they intend their product to be run, and offers verbatim inclusion of their
+response in the writeup:
+
+- lean-ctx: [yvgude/lean-ctx#361](https://github.com/yvgude/lean-ctx/issues/361)
+- rtk: [rtk-ai/rtk#2292](https://github.com/rtk-ai/rtk/issues/2292)
+- headroom: [chopratejas/headroom#645](https://github.com/chopratejas/headroom/issues/645)
+
+Configuration corrections suggested by maintainers will be tested in the
+replication runs via numbered protocol amendments.
+
 ## Conflicts & scope
 
 The harness (forge-cli/4ge) and the testbench project are the author's products;
