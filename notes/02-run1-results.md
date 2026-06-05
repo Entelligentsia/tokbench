@@ -297,3 +297,31 @@ Scope caveats: different models, different pipeline shape (workflow subagents),
 subscription billing, N=1, operator nudge required.
 
 Data: results/c0-T-fix-claude-r1/ (main session jsonl + full subagent tree + aborted attempt).
+
+## Cost projection — same task in API dollars (2026-06-06)
+
+Pricing (per MTok): Opus 4.8 $5/$25 · Sonnet 4.6 $3/$15 · Haiku 4.5 $1/$5;
+cache read 0.1×, cache write 1.25× (5-min TTL).
+
+**c0 actual (Claude Code + plugin), exact from transcripts: $6.09**
+(opus-4-8 $1.76 · opus-4-5 $2.65 · sonnet-4-6 $1.18 · haiku-4-5 $0.50;
+8.08M cache reads dominate; fresh input only 42.6K.)
+
+**4ge A0 profile on Anthropic** (tier map glm-5.1→Opus 4.8, 4.7→Sonnet 4.6,
+4.6→Haiku 4.5):
+- uncached: ≈ $8.12 (more than Claude Code despite 3.8× fewer tokens —
+  caching beats frugality at these price ratios)
+- cached (4ge does good cache control per operator — the realistic case):
+  ≈ **$1.81 → ~3.4× cheaper than Claude Code on the identical task.**
+  Lean context + cache discount COMPOUND.
+
+Middleware corollary, sharpest form: cached-vs-uncached gap ($1.81 vs $8.12,
+~$6.30) dwarfs every middleware saving measured in this study (best: headroom
+342K ≈ $1 even at full Opus input price, far less at the margin). On
+cache-discounted providers, PREFIX STABILITY IS THE DOMINANT ECONOMIC LEVER;
+context-rewriting middleware that breaks it is economically upside-down.
+(Research series 03/08 caching-trap thesis, now with measured workload numbers.)
+
+Caveats: glm vs Claude tokenizer counts differ; turn counts model-dependent;
+tier map is a judgment call; cached scenario assumes clean prefix stability.
+Projection, clearly labeled — directionally robust.
