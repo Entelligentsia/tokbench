@@ -60,7 +60,7 @@ pre-registered protocol.
 
 ## 3. Run-capture (every publication run)
 
-- [ ] asciinema cast per run (fixed geometry; cast = operator audit log + blog embed)
+- [~] asciinema DOWNGRADED TO OPTIONAL (2026-06-06): casts are illustration, not evidence — operator conduct auditable from transcripts; README ships a replay-it-yourself recipe. Keep: the one a1m directors cut (blog hero candidate); skip remaining replay recordings.
 - [x] **Pilot-run casts recoverable retroactively:** kept containers replay the whole
   run via `forge:transcript` — asciinema-record the replays (zero quota). This is why
   run containers are never destroyed. Plan: one cast per pilot run (a0, a1, a1m, a3, a2)

@@ -77,7 +77,13 @@ quota-before reading → launch via documented run command (1.0 images, runtime
 OLLAMA_API_KEY) → type exactly one invocation → observe only; any prompt answered
 with its documented default → exit on completion (harvest fires) → quota-after
 reading → `docker compose stop` for a2 sidecar. Containers kept (no --rm),
-named tokbench-<arm>-<task>-r<rep>. Every run asciinema-recorded.
+named tokbench-<arm>-<task>-r<rep>.
+
+Recording: asciinema is OPTIONAL (illustration only, not evidence). Operator
+conduct is auditable from the transcripts themselves: the pipeline is autonomous
+after the single invocation, and operator touchpoints go through recorded
+channels (forge_ask_user tool calls, session message log). Any reader can render
+any published run with the replay recipe in the README.
 
 ## 7. Analysis plan
 

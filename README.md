@@ -108,6 +108,19 @@ Arm images build the same way (`bench/docker/arm-*/`). Every binary is
 vendored and sha256-pinned; versions in [`bench/pins.env`](bench/pins.env).
 Full pre-registered replication protocol: [`bench/PROTOCOL.md`](bench/PROTOCOL.md).
 
+### Watch any published run
+
+Every run's transcripts are in `results/` — render them in forge's own viewer:
+
+```bash
+docker run -it --rm \
+  -v $PWD/results/a0-T-fix-r1/transcripts:/home/bench/forge-testbench/cartographer/.forge/transcripts \
+  --entrypoint bash tokbench-base:1.0
+# inside:  cd ~/forge-testbench/cartographer && forge   → open the transcript viewer
+```
+
+No pre-rendered recordings needed — the data *is* the footage.
+
 ## Conflicts & scope
 
 The harness (forge-cli/4ge) and the testbench project are the author's products;
