@@ -1,8 +1,11 @@
 # tokbench — an independent eval of token-saving middleware for coding agents
 
-**Question:** do context-management middlewares (lean-ctx, rtk, headroom) actually
-reduce what the provider bills you for, on a real long-running agentic software
-engineering workload — and at what cost?
+**Question:** do context-management middlewares —
+[lean-ctx](https://github.com/yvgude/lean-ctx) (tool-level context runtime),
+[rtk](https://github.com/rtk-ai/rtk) (command-level output rewriter),
+[headroom](https://github.com/chopratejas/headroom) (wire-level compression proxy) —
+actually reduce what the provider bills you for, on a real long-running agentic
+software engineering workload — and at what cost?
 
 **Answer (pilot, N=1 per arm — replication runs in progress, see [PROTOCOL](bench/PROTOCOL.md)):**
 
@@ -39,12 +42,33 @@ not whether the products "work."
 ## How we tested — and why this is representative
 
 **The workload is real software engineering, not a synthetic benchmark.**
-Each run drives a full SDLC pipeline on [forge-cli (4ge)](https://4ge.sh):
-plan → review-plan → implement → review-code → validate → approve → commit →
-writeback — 8 agent personas, ~180–240 model turns, ~2.2–3.6M input tokens,
-objective pass/fail gates (build, tests, lint, acceptance criteria). This is
-**long-running agentic orchestration**: the dominant real-world context-cost
-regime, where every turn re-pays the accumulated context.
+
+The task — `CART-S01-T01` — is an actual bug in *cartographer*, a small TypeScript
+CLI (commander + lowdb): its `save()` used `await import("fs")` inside a synchronous
+function, a TS1308 compile error that meant `mkdirSync` never ran — first write on a
+fresh machine would fail. The agent has to diagnose it, fix the import, keep `save()`
+synchronous, prove it with the regression test, and leave build/test/lint green plus
+the project docs updated. Small, sharp, and exactly the shape of a thousand daily
+engineering tickets — not a LeetCode puzzle, not a 10-file refactor staged for demo
+effect.
+
+One command — `/forge:run-task CART-S01-T01` — drives the full
+[forge-cli (4ge)](https://4ge.sh) SDLC pipeline around that fix:
+
+```mermaid
+flowchart LR
+    P[plan] --> RP[review-plan] --> I[implement] --> RC[review-code]
+    RC --> V[validate] --> A[approve] --> C[commit] --> W[writeback]
+```
+
+Eight phases, each executed by a different **persona** (architect, supervisor,
+engineer, QA…) on its own model tier (glm-5.1 / 4.7 / 4.6). Reviews gate
+progression — a plan must survive review before implementation starts; code must
+survive review before validation; validation runs the real gates. The pipeline
+ends in an actual git commit and a knowledge-base writeback. One run ≈ 180–240
+model turns, ~2.2–3.6M billed input tokens, 13–27 minutes of model time. This is
+**long-running agentic orchestration** — the dominant real-world context-cost
+regime, where every turn re-pays its accumulated context.
 
 **Everything is held constant except the middleware:**
 
@@ -81,19 +105,36 @@ analytics, which we capture separately and audit against the bill.
 
 ## Why this harness is a fair — and demanding — test
 
-forge-cli is itself context-frugal by design, and we publish that rather than
-hide it (it is also the author's own product — see [Conflicts](#conflicts--scope)):
+forge-cli practices **context governance as architecture**, and we publish that
+rather than hide it (it is also the author's own product — see
+[Conflicts](#conflicts--scope)). What that means concretely:
 
-- **Custom i/o tools:** forge routes its knowledge-base and state operations
-  through its own compact tools (`forge_store`, `forge_artifact`) — middleware
-  cannot see that traffic, and it is already small.
-- **Internal compression:** the harness ships its own output-compression layer
-  and a minimalist pi runtime (sub-1K system prompt philosophy).
-- **But it still does the normal, token-hungry things:** raw source reads, `git`,
-  `npm test`, lint runs, shell exploration — measured at **~26% of context** in
-  the native baseline. That slice is exactly what these middlewares exist to
-  compress. A product that earns its keep here earns it anywhere; a product that
-  only shines on a wasteful harness is solving the harness's problem, not yours.
+- **Every phase is context-isolated.** The implement agent never sees the
+  planner's 35-turn exploration — it sees the *plan*. Each of the 8 phases starts
+  a fresh agent with a fresh context (final contexts run only 13–24K tokens);
+  nothing accumulates across phase boundaries. Cross-phase handoff happens
+  through reviewed **artifacts** (PLAN.md, review verdicts, validation reports),
+  not through a shared ever-growing transcript. Phase isolation is the single
+  most effective context optimization in this entire benchmark — and the harness
+  does it natively, for free.
+- **State i/o goes through governed tools.** Knowledge-base reads, store
+  transitions, and artifact passing use forge's own compact, schema-validated
+  tools (`forge_store`, `forge_artifact`) — traffic middleware cannot see, and
+  which is already near-minimal by construction.
+- **Persona-scoped context.** Each phase's agent gets the knowledge-base slice
+  its role needs, on the model tier its role warrants — not the whole project
+  dumped into every prompt.
+- **But the normal, token-hungry work remains.** Inside each phase the agent
+  still reads real source files, runs `git`, `npm test`, eslint, and explores
+  with the shell — measured at **~26% of context** in the native baseline.
+  That slice is precisely what these middlewares exist to compress.
+
+This is what makes the test demanding *and* fair: the middlewares aren't
+competing against naive context accumulation — they're competing against a
+harness that already governs its context, on the residual surface every real
+harness still has. A product that earns its keep here earns it anywhere; a
+product that only shines on a wasteful harness is solving the harness's
+problem, not yours.
 
 ## Reproduce it
 
