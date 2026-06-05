@@ -22,6 +22,7 @@ Pins: `../bench/pins.env` · Results: `../results/` · Arm Dockerfiles: `../benc
 - ✅ base:1.0 BUILT + CERTIFIED (reproducible, credential-free; a0v validation run: A0 reproduces within 1.3% across bases; tools-fix worth ~100–140k/run)
 - ✅ 1.0 arm images built + verified: a1m:1.0, a3:1.0, a2:1.0 (binaries vendored + sha256-pinned; compose on 1.0 with runtime OLLAMA_API_KEY)
 - ⬜ NEXT (no quota): freeze pre-registered protocol; replay casts from preserved containers; push testbench commits
+- ⬜ NEXT MORNING: a0c run (4ge on Anthropic — image built, command in chat/notes; measures real cache economics + dollars vs $1.81 projection and c0 $6.09)
 - ⬜ THEN (post weekly reset): 14-run rep matrix on 1.0 images (A0×5, a1m×3, a2×3, a3×3)
 - ✅ a3 (rtk) image built: `tokbench-arm-a3:0.1` — rtk 0.42.2, pi ext, arm-setup re-init hook; rewrite sanity verified (git→rewrite exit 3; node store-cli→passthrough exit 1 as predicted)
 - ✅ a2 (headroom) BUILT + SMOKE-TESTED — proxy chain to ollama-cloud verified incl. streaming; CCR self-handles retrieves at wire level (earlier "trap" was wrong — defaults correct); compose pair in bench/docker/arm-a2-headroom (see 03)
