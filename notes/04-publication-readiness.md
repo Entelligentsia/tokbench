@@ -78,7 +78,10 @@ pre-registered protocol.
 - [ ] **Scope statement:** one harness, one provider (no cache economics), one small
   codebase, interactive operator protocol. Claims scoped: "on this harness" — explicitly
   NOT "these products don't work" (rtk demonstrably worked; surface was small).
-- [ ] **Vendor right-of-reply:** before publication, share findings + repro steps with
+- [x] **Vendor right-of-reply FILED 2026-06-06** (publication date stated: June 17):
+  lean-ctx#361 · rtk#2292 · headroom#645 — each links repo+protocol, asks config-faithfulness,
+  offers verbatim response inclusion. Replication runs can incorporate vendor-suggested configs
+  via protocol amendment if warranted. Original plan: share findings + repro steps with
   lean-ctx, rtk, headroom maintainers. File bugs found:
   - lean-ctx: init-written mcp.json disables own MCP bridge on pi (adapter-configured
     trap); ctx_read envelope > source on small files; no ~13-tok re-read via one-shot path
