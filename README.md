@@ -98,13 +98,13 @@ hide it (it is also the author's own product — see [Conflicts](#conflicts--sco
 ## Reproduce it
 
 ```bash
-git clone <this-repo> && cd tokbench/bench/docker/base-1.0
+git clone <this-repo> && cd tokbench/bench/docker/base
 docker build -t tokbench-base:1.0 .            # fully scripted, no secrets
 docker run -it -e OLLAMA_API_KEY=<yours> tokbench-base:1.0
 # inside: /forge:run-task CART-S01-T01  — that's the native arm, end to end
 ```
 
-Arm images build the same way (`bench/docker/arm-*-1.0/`). Every binary is
+Arm images build the same way (`bench/docker/arm-*/`). Every binary is
 vendored and sha256-pinned; versions in [`bench/pins.env`](bench/pins.env).
 Full pre-registered replication protocol: [`bench/PROTOCOL.md`](bench/PROTOCOL.md).
 
