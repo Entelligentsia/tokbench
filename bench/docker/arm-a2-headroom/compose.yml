@@ -1,0 +1,44 @@
+# arm-a2-headroom — wire-level interception: pi -> headroom proxy -> ollama-cloud
+# Sidecar pair. CCR stays at defaults: proxy SELF-HANDLES headroom_retrieve calls
+# (ccr_handle_responses=True) — fully transparent to pi; no MCP needed.
+# Run:  docker compose -f compose.yml run --rm runner   (interactive; runner waits on proxy /readyz)
+
+name: tokbench-a2
+
+services:
+  headroom:
+    image: ghcr.io/chopratejas/headroom@sha256:1f4f12b4e13da3cae33cafeb2a8f4017a2b8be63566538e5fc2b8d1e45a83ee0
+    # image ENTRYPOINT is ["headroom","proxy"] — command supplies flags only
+    command: >
+      --host 0.0.0.0 --port 8787
+      --openai-api-url https://ollama.com
+      --no-rate-limit
+      --log-file /data/proxy.jsonl
+    environment:
+      HEADROOM_TELEMETRY: "off"
+    volumes:
+      - ./proxy-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8787/readyz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  runner:
+    image: tokbench-arm-a2:1.0
+    container_name: tokbench-a2-run
+    stdin_open: true
+    tty: true
+    environment:
+      ARM: a2
+      TASK: ${TASK:-CART-S01-T01}
+      REP: ${REP:-1}
+      TOKBENCH_IMAGE: tokbench-arm-a2:1.0
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:?set OLLAMA_API_KEY for the 1.0 runner}
+      OLLAMA_API_BASE: http://headroom:8787
+      HEADROOM_URL: http://headroom:8787
+    volumes:
+      - ${RESULTS_DIR:-../../../results/a2-T-fix-r1}:/results
+    depends_on:
+      headroom:
+        condition: service_healthy
