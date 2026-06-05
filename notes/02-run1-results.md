@@ -247,3 +247,24 @@ longer crashing saves ~100–140k/run (the forge package.json bug's cost, quanti
 Provider health: ollama-cloud transient 500s recorded in 5 phases' errorMessage
 (all retried, phases completed). REP PROTOCOL ADDITION: record provider-error
 counts per run.
+
+## a2 ledger verification (2026-06-06, prompted by operator challenge)
+
+Challenge: "why do you say headroom saved tokens" — the −342K had been taken from
+headroom's own /stats (same class of self-report we dismissed for rtk/lean-ctx).
+Audit performed against proxy.jsonl per-request ledger:
+1. Σ input_tokens_optimized = 3,244,474 vs provider-billed 3,244,460 → 0.0004% —
+   headroom's accounting basis IS the billed basis.
+2. Untouched requests (no transforms): original==optimized exactly in 43/45 —
+   calibrates the "original" (counterfactual) measure on the same basis. (2
+   mismatches unexplained — inspect; likely retried requests.)
+3. All 194 compressed requests: original−optimized==tokens_saved exactly.
+VERDICT: per-request compression of 342K billed-basis tokens is VERIFIED, not
+self-reported. PROPERLY SCOPED CLAIM: headroom compressed what it forwarded;
+the a2 RUN still billed +43% vs A0 because the run path was longer (237 vs 180
+turns, N=1). Whether per-request compression translates to cheaper RUNS is an
+open question the reps answer. (Hypothesis to watch: compressed contexts may
+alter model behavior → longer paths.)
+METHOD NOTE for the article: judge every product's self-meter against the bill —
+rtk's meter (chars/4 heuristic) and lean-ctx's gain were not verifiable this way;
+headroom's was, and passed. That asymmetry is itself a finding (thread 09).

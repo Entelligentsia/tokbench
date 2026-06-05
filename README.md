@@ -18,9 +18,12 @@ lean-ctx 3.7 (MCP)      ██████████████████�
 headroom 0.23           ███████████████████████████████     3.24M   +43%*
 lean-ctx 3.7 (default)  ███████████████████████████████████ 3.62M   +59%
 
-* headroom's wire counterfactual: it removed 342K tokens the run would
-  otherwise have billed (−9.5%) — the only genuine saving measured.
-  The +43% headline is run-path variance, not the proxy. See below.
+* headroom genuinely compressed its requests: 342K tokens removed, VERIFIED
+  against the provider's bill (its per-request ledger sums to the billed total
+  within 0.0004%; untouched requests calibrate the baseline exactly). But note
+  what that does NOT mean: the a2 RUN still billed more than native, because
+  its run path was longer (237 vs 180 turns, N=1). Per-request compression is
+  real; whether it makes runs cheaper is what the replication answers.
 ```
 
 ```text
