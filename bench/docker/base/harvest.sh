@@ -25,9 +25,11 @@ find "$PROJ/.forge/transcripts" -name '*__*.json' ! -name '*writeback*SUMMARY*' 
           .stopReason, (.errorMessage // "-")] | @tsv' "$f" 2>/dev/null
 done >> "$SUMMARY"
 
-# 3. supporting state: store + sprint artifacts + pi session logs
+# 3. supporting state: store + THIS TASK's sprint artifacts only (other sprints are
+#    untouched golden fixtures — copying them just duplicates identical noise per run)
 cp -r "$PROJ/.forge/store"  "$DEST/forge-store"  2>/dev/null
-find "$PROJ/engineering/sprints" -mindepth 1 -maxdepth 1 -type d -exec cp -r {} "$DEST/" \; 2>/dev/null
+TASK_SPRINT="${TASK%-T*}"
+[ -n "$TASK_SPRINT" ] && cp -r "$PROJ/engineering/sprints/$TASK_SPRINT" "$DEST/sprint-$TASK_SPRINT" 2>/dev/null
 [ -d "$HOME/.pi/agent/sessions" ] && cp -r "$HOME/.pi/agent/sessions" "$DEST/pi-sessions" 2>/dev/null
 
 # 4. product self-metrics + engage-checks (per-arm; absent files are fine)
