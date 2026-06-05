@@ -1,7 +1,7 @@
 # Pre-Registered Protocol — Token-Middleware Eval, Publication Runs
 
-**Version:** 1.0-draft (becomes 1.0-FROZEN at git commit; no changes after freeze except
-via numbered amendments appended below, never edits)
+**Version:** 1.0-FROZEN (operator-approved 2026-06-06; changes only via numbered
+amendments appended below, never edits)
 **Drafted:** 2026-06-05
 **Pilot disclosure:** an exploratory pilot (5 arms × 1 run, T-fix) ran 2026-06-05 on
 pre-reproducibility infrastructure. Its results are KNOWN to the authors and are
