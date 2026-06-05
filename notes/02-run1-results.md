@@ -268,3 +268,32 @@ alter model behavior → longer paths.)
 METHOD NOTE for the article: judge every product's self-meter against the bill —
 rtk's meter (chars/4 heuristic) and lean-ctx's gain were not verifiable this way;
 headroom's was, and passed. That asymmetry is itself a finding (thread 09).
+
+## c0 — Claude Code + forge plugin (apples-to-ORANGE reference, 2026-06-05 19:20–19:38 UTC)
+
+Same task, same golden state, forge PLUGIN pipeline via /carto:run-task on the HOST
+(clean MCP config: --strict-mcp-config, no lean-ctx server; global CLAUDE.md ctx_*
+instructions present but toolless — documented caveat). Subscription billing.
+First attempt SHORT-CIRCUITED: Opus checked git history, found the baseline's prior
+commit (eb77aaf) and declared the task already done — none of the 9 glm pipeline
+runs ever did this. Documented operator nudge ("store is source of truth, status=
+draft") → full pipeline ran: Workflow tool, 17 agents, commit fd2577e, store
+committed, gates green. Aborted attempt banked separately (results/c0.../aborted-attempt).
+
+TOTALS (main run, orchestrator + 17 workflow agents, 391 API messages):
+fresh input 42,614 (0.5%) · cache_read 8,082,294 (93%) · cache_write 560,335 ·
+output 45,509 · TOTAL fed 8,685,243 = 3.8× A0's volume.
+Model mix (plugin's own tiering): opus-4-8 39 / opus-4-5 136 / sonnet-4-6 91 /
+haiku-4-5 125 msgs.
+
+COST-WEIGHTED (Anthropic: cache read 0.1×, write 1.25×): effective input
+≈ 1.55M full-price-equivalent < A0's raw 2.28M despite 3.8× volume.
+**THE CACHING-TRAP THESIS, MEASURED:** cache-discounted providers make raw token
+counts meaningless; Claude Code's architecture MAXIMIZES stable-prefix re-reads
+(93% of tokens at 10% price). Corollary for middleware: a context rewriter that
+breaks prefix stability here would convert 10%-price reads into full-price tokens —
+"savings" could multiply cost. (Research series 08's prediction, now anchored.)
+Scope caveats: different models, different pipeline shape (workflow subagents),
+subscription billing, N=1, operator nudge required.
+
+Data: results/c0-T-fix-claude-r1/ (main session jsonl + full subagent tree + aborted attempt).
