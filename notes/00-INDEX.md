@@ -23,7 +23,7 @@ Pins: `../bench/pins.env` · Results: `../results/` · Arm Dockerfiles: `../benc
 - ✅ 1.0 arm images built + verified: a1m:1.0, a3:1.0, a2:1.0 (binaries vendored + sha256-pinned; compose on 1.0 with runtime OLLAMA_API_KEY)
 - ✅ **lean-ctx maintainer RESPONDED** (#361, 2026-06-05/06): mcp.json trap confirmed as bug, **3.7.4 shipped** (flag-wins); re-run requested pre-June-17; maintainer statement offered. Our reply posted with adoption decomposition (11 ctx_* vs 112 native; cep.sessions=0 puzzle) + additive-vs-replace question. See 03.
 - ✅ **Protocol Amendment A1** committed: a1m replication arm = lean-ctx 3.7.4, workaround dropped → **tokbench-arm-a1m:1.1** (276576ce0a27) built + verified credential-free
-- ⬜ NEXT MORNING: a0c run (4ge on Anthropic — image built, command in chat/notes; measures real cache economics + dollars vs $1.81 projection and c0 $6.09)
+- ✅ **a0c run COMPLETE** (2026-06-06): **$1.82 actual vs $1.81 projected** — exact to the cent; 92.1% cache reads, 261 fresh input tokens whole run, 108 turns (glm: 180), 3.3× cheaper than Claude Code's $6.09. Full table + 5 findings in 02. Deviation logged (bash entrypoint → manual launch + post-hoc harvest; run counts, exploratory)
 - ⬜ THEN (post weekly reset): 14-run rep matrix — **a1m runs use arm-a1m:1.1** (A0×5, a1m×3, a2×3, a3×3)
 - ⬜ WATCH: #361 maintainer answer on additive-vs-replace mode → possible Amendment A2; rtk#2292 + headroom#645 still unanswered
 - ✅ a3 (rtk) image built: `tokbench-arm-a3:0.1` — rtk 0.42.2, pi ext, arm-setup re-init hook; rewrite sanity verified (git→rewrite exit 3; node store-cli→passthrough exit 1 as predicted)

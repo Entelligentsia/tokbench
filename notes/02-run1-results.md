@@ -325,3 +325,44 @@ context-rewriting middleware that breaks it is economically upside-down.
 Caveats: glm vs Claude tokenizer counts differ; turn counts model-dependent;
 tier map is a judgment call; cached scenario assumes clean prefix stability.
 Projection, clearly labeled — directionally robust.
+
+## a0c — 4ge on Anthropic models, MEASURED (2026-06-06 01:49–02:00 UTC, wall 11m09s)
+
+Image tokbench-arm-a0c:1.0-auth (subscription OAuth rail; pi-ai computes API-rate
+cost per request from provider usage). 8/8 phases, gates green (build=test=lint=0),
+3 tool-errs. DEVIATION logged in manifest: auth image inherited ENTRYPOINT=bash →
+run-task.sh didn't auto-fire; manual forge launch from provably pristine container;
+harvest post-hoc via docker exec. Exploratory arm — outside the 14-run matrix.
+
+| phase | model | fresh-in | cacheRead | cacheWrite | out | USD | turns |
+|---|---|---:|---:|---:|---:|---:|---:|
+| plan | sonnet | 17 | 179,277 | 19,539 | 4,835 | 0.20 | 15 |
+| review-plan | opus | 20 | 162,570 | 23,462 | 5,344 | 0.36 | 10 |
+| implement | sonnet | 18 | 200,119 | 10,802 | 3,759 | 0.16 | 16 |
+| review-code | opus | 24 | 210,757 | 14,596 | 5,415 | 0.33 | 12 |
+| validate | sonnet | 19 | 275,428 | 20,674 | 5,496 | 0.24 | 17 |
+| approve | opus | 18 | 144,594 | 15,922 | 4,151 | 0.28 | 9 |
+| writeback | haiku | 124 | 97,290 | 13,137 | 2,695 | 0.04 | 10 |
+| commit | sonnet | 21 | 269,496 | 14,546 | 5,084 | 0.21 | 19 |
+| **TOT** | | **261** | **1,539,531** | **132,678** | **36,779** | **1.82** | **108** |
+
+Per model: opus $0.969 · sonnet $0.811 · haiku $0.04.
+
+**Findings:**
+1. **$1.82 actual vs $1.81 projected** — the cached projection was exact to the cent.
+   3.3× cheaper than c0's $6.09 (projected ~3.4×).
+2. **Cache discipline measured: 92.1% of input-side tokens were cache reads**
+   (1.54M reads / 133K writes / 261 fresh in the WHOLE run). Same hit-rate class as
+   Claude Code (93%) on 5.2× less volume (1.67M vs 8.69M input-side). Phase isolation's
+   cache cost = 8 cold prefix writes ≈ the 13–25K starting context each — small.
+3. Uncached counterfactual on identical traffic ≈ $6.60 → caching saved ~72%
+   (~$4.80/run) — ~14× headroom's best measured effect. Prefix-stability thesis
+   now MEASURED, not projected.
+4. **Model family owned the glm pathologies**: 108 turns vs A0-glm's 180 (−40%);
+   writeback 10 turns on haiku (glm-4.6: 35); commit 19 turns (glm-4.7: 38).
+   Same harness, same task — turn-path efficiency is a model property.
+5. forge-compress salience flip (operator obs, live): ~15K compressed was noise vs
+   2.28M request-metered; against 261 fresh + 133K cache-writes it's same order as
+   the costly traffic. The payment rail decides which optimizations matter.
+   ⬜ TODO: locate compression events in transcripts; test the compression↔cache-write
+   antagonism (does a mid-phase compress trigger a prefix re-write at 1.25×?).
