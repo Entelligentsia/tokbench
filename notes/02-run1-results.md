@@ -139,6 +139,51 @@ time, vendor meter itself reports zero savings. The as-shipped default was stric
 worse. On a lean harness + small codebase, lean-ctx provided no measurable value in
 any configuration tested, per its own dashboard and per the provider-billed meter.
 
+## a1f — lean-ctx 3.7.4 + forge-routing addendum (tokbench-arm-a1f:0.1, 2026-06-06 03:43–03:52 UTC, EXPLORATORY)
+
+Adoption-ceiling test: forge-specific routing table in LEAN-CTX.md (lean-ctx's own
+rules surface, @-imported via AGENTS.md; ZERO forge changes). Bridge gate passed.
+8/8 phases, gates green, plan passed first try (vs stock-3.7.4 s374's 0-for-2).
+
+| phase | model | input | output | ctxTok | turns | sec |
+|---|---|---:|---:|---:|---:|---:|
+| plan | glm-4.7 | 355,732 | 4,464 | 22,851 | 22 | 41 |
+| review-plan | glm-5.1 | 206,241 | 3,989 | 21,865 | 12 | 43 |
+| implement | glm-4.7 | 299,746 | 3,640 | 20,546 | 19 | 41 |
+| review-code | glm-5.1 | 369,636 | 3,461 | 20,515 | 23 | 59 |
+| validate | glm-4.7 | 322,303 | 4,328 | 20,451 | 20 | 45 |
+| approve | glm-5.1 | 190,406 | 2,571 | 17,785 | 13 | 50 |
+| writeback | glm-4.6 | 205,795 | 1,284 | 13,128 | 19 | 112 |
+| commit | glm-4.7 | 657,509 | 4,146 | 28,687 | 35 | 95 |
+| **TOTAL** | | **2,607,368** | **27,883** | | **163** | **486** |
+
+Adoption: 31 ctx calls (16 ctx_read, 4 shell, 4 ctx_find, 3 ctx_call, 2 ctx_ls,
+2 ctx_grep) vs 27 native read + 63 bash → reads 37% routed, shell ~9%. 3× stock a1m.
+Gain meter: **first nonzero ever — "921 tokens saved · 7.9% · $0.02"**. Run still
+billed +331K (+14.5%) vs A0. sec/turn 3.0 (≈native 2.8; stock a1m was 4.2).
+Commit still the whale (657K/35 turns — lean-ctx commit inflation survives routing).
+
+### STRUCTURAL FINDING — read path never reaches the bridge cache (3rd consecutive run)
+
+stats.json: the 15 ctx_read calls recorded as `cli_full` (one-shot CLI subprocess),
+`cep.sessions: 0`, `cache_hits: 0` — with bridge confirmed connected. Mechanism:
+the bridge serves ONLY the 9 secondary tools (ctx_call/expand/graph/knowledge/…);
+ctx_read/ctx_shell/ctx_grep are extension-implemented and spawn the CLI per call.
+Session cache lives in the server process → one-shots can't touch it. **On pi, the
+~13-token cached re-read — the core value prop — is structurally unreachable**,
+bridge or no bridge. Maintainer's precondition ("connected → session cache → cheap
+re-reads") is false for the pi path. Combined with steering-inert (#168 descs
+deduped off bridge): neither of 3.7.4's adoption/caching mechanisms can reach pi.
+
+### Adoption-gradient verdict (lean-ctx family, N=1 each, version caveat)
+| config | adoption | vendor meter | billed vs A0 |
+|---|---|---|---|
+| stock a1m | 11 calls (~9%) | 0 saved | +38% |
+| max legitimate (a1f) | 31 calls (37% reads) | 921 tok / $0.02 | +14.5% |
+
+The binding constraint isn't adoption — even maximal routed adoption saves cents
+because the cache that would make adoption pay cannot engage on this path.
+
 ## a3 — rtk 0.42.2 (tokbench-arm-a3:0.1, run ended 13:48 UTC, wall ~22m incl. operator hold)
 
 | phase | model | input | output | ctxTok | turns | sec |
