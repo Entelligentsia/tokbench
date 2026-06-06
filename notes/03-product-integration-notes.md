@@ -119,6 +119,57 @@ committed to PROTOCOL.md; supersedes A1 for a1m runs. Still open with maintainer
 additive-vs-replace designation; now also the cep-meter attribution and the
 four still-CLI read tools.
 
+### s375 shakedown (a1m-T-fix-s375, 2026-06-06) — the cache works; the harness removes its surface
+
+3.7.5 stock, gate passed (connected, 9 bridge tools, new duplicate-note for
+mcp.json — informational). End-of-window quota spend (81.7% pre-run, projection
+<90% per §8).
+
+**Results:** 8/8 phases stop-clean, gates green (s374 plan-halt did NOT recur →
+conclusion-8 tally now 2-of-6 with-lean-ctx halts). 4,018,335 input (+76% vs
+native; commit phase ballooned to 1.22M/55t — N=1, treat total as noisy). 223
+turns, 14.9m model time. Engage: 38 ctx_* calls.
+
+**Adoption — the steering fix works:** 23 ctx_read vs 24 native read = **49% read
+adoption on stock config** (pilot 9%, a1f routing-addendum 37%). First time
+description steering measurably moved tool choice on pi. Shell adoption: zero
+(102 bash, 0 ctx_shell).
+
+**Savings — still zero, and now we know exactly why.** gain: "0 saved · 0.0% ·
+39 commands". stats.json: ctx_read×23 correctly labeled (bridge-routed),
+cli_find/ls/shell for the rest (extension-CLI path, as read from source);
+cep.sessions=0 (5th occurrence, now at run scale with 23 bridge-routed reads).
+Transcript analysis: NOT ONE cached-stub payload in the whole run. Repeat reads
+existed — graph.ts ×5, PLAN.md ×4 — but **every repeat was cross-phase; zero
+within-phase repeats** (phase isolation working as designed). All five graph.ts
+reads returned identical 3,537-char full payloads, including adjacent-phase
+pairs where the file was untouched.
+
+**Mechanism (probe-verified in a fresh 1.2 container):** two sequential server
+processes reading the same untouched file — process 1: full payload, then
+28/69-char stubs; process 2 first read: **full payload again** (4,242 chars).
+The session cache is in-memory per server process. Each forge phase runs a
+fresh agent process → fresh bridge → cold cache. **Phase isolation and the
+lean-ctx cache monetize the same redundancy (cross-context re-reads); on a
+harness that already eliminates it at the architecture level, the cache surface
+is structurally zero — under ANY configuration, with every product bug fixed.**
+
+Corollary: with zero cache payback, every adopted ctx_read is a one-shot read
+with envelope overhead (~4.1K served vs 3.6K source on graph.ts) — so the
+steering fix that took read adoption from 9% to 49% *increases* cost on this harness.
+Adoption without surface is pure tax. This is the writeup's cleanest
+architecture–surface-fit demonstration and likely the final word on the a1m arm
+pending the matrix reps.
+
+**Operator incident (logged for integrity):** post-harvest, a `docker start` on
+the preserved run container re-ran the entrypoint → golden reset wiped the
+in-container .forge/transcripts copy (untracked → git clean). Host-side harvest
+(primary data) was complete and untouched — verified; backup taken
+(/tmp/a1m-T-fix-s375-backup.tgz); container SIGKILLed before harvest could
+re-fire over /results. No primary-data loss; the run's git commit survived in
+project history. RULE: read preserved containers ONLY via `docker cp` on the
+stopped container — never `docker start`.
+
 ## rtk 0.40.0 on pi (a3 — image not yet built)
 
 **No degraded-path risk:** filter registry (~70 command patterns, src/discover/rules.rs)

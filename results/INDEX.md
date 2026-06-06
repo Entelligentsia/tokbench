@@ -19,7 +19,8 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
 | 8 | [a0c-T-fix-r1](a0c-T-fix-r1/) | 06-06 | 4ge native on Anthropic models (cache economics) | arm-a0c:1.0-auth | **1,672,470 input-side** (92.1% cache reads, 261 fresh) | 108 | 11.1m wall | EXPLORATORY | **$1.82 actual vs $1.81 projected.** 3.3× cheaper than Claude Code; caching saved ~72% (~$4.80) — ~14× the best middleware effect |
 | 9 | [a1m-T-fix-s374](a1m-T-fix-s374/) | 06-06 | lean-ctx 3.7.4 stock shakedown | arm-a1m:1.1 | (2 aborted attempts, ~437K burned) | 31 | — | VOID | Plan phase 0-for-2, two distinct workflow-compliance failures (plan-as-chat-"article"; set-summary skipped). Steering delta ruled out (surface byte-identical) |
 | 10 | [a1f-T-fix-r1](a1f-T-fix-r1/) | 06-06 | lean-ctx 3.7.4 + forge-routing addendum (adoption ceiling) | arm-a1f:0.1 | **2,607,368** (+14.5%) | 163 | 8.1m | EXPLORATORY | Adoption 3× (37% of reads); gain meter first-nonzero: "921 saved · $0.02". **ctx_read runs one-shot CLI even with bridge connected (cep.sessions=0, 3rd run) → cached re-read structurally unreachable on pi** |
-| 11–24 | — | post weekly reset | 14-run matrix: A0×5, a1m×3 (arm-a1m:1.1), a2×3, a3×3 | 1.0-gen images | | | | MATRIX | Publication dataset. Frozen order in [PROTOCOL §3](../bench/PROTOCOL.md); claim rule: arm median outside A0×5 range |
+| 11 | [a1m-T-fix-s375](a1m-T-fix-s375/) | 06-06 | lean-ctx 3.7.5 stock shakedown (Amendment A2) | arm-a1m:1.2 | **4,018,335** (+76%)* | 223 | 14.9m | EXPLORATORY | 8/8 phases, gates green (s374 halt did NOT recur). Read adoption 49% on stock config (steering works: 23 ctx_read vs 24 native) — gain meter still "0 saved": zero cache hits. **All repeats cross-phase; cache is per-server-process (probe-verified) → phase isolation structurally zeroes the cache surface.** cep.sessions=0 (5th time, now with 23 bridge-routed reads). *commit phase ballooned (1.22M/55t); N=1 |
+| 12–25 | — | post weekly reset | 14-run matrix: A0×5, a1m×3 (arm-a1m:1.2), a2×3, a3×3 | 1.0-gen images | | | | MATRIX | Publication dataset. Frozen order in [PROTOCOL §3](../bench/PROTOCOL.md); claim rule: arm median outside A0×5 range |
 
 ## Standing conclusions (as of 2026-06-06, pre-matrix)
 
@@ -30,12 +31,19 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
    matrix answers.
 3. **rtk works exactly as designed; its addressable surface here (~2.5%) is below
    the noise floor.** Architecture–surface fit, not product quality.
-4. **lean-ctx on pi cannot currently deliver its core mechanism**: the read path
-   never reaches the bridge session cache (3 runs, cep.sessions=0), 3.7.4's
-   adoption steering is deduped off the pi path, and as-shipped defaults disable
-   the bridge entirely. Maintainer engaged in
-   [lean-ctx#361](https://github.com/yvgude/lean-ctx/issues/361); fixes enter via
-   numbered protocol amendments.
+4. **lean-ctx's cache mechanism now works on pi (3.7.5) — and the harness
+   structurally removes its surface.** The maintainer fixed everything we
+   reported (bridge default-on, ctx_read bridge-routed, steering agent-visible —
+   probe-verified: re-reads collapse to ~13-token stubs within a server
+   process). But the session cache is per-process, each forge phase is a fresh
+   process, and phase isolation means repeat reads happen only ACROSS phases
+   (s375: 5 cross-phase graph.ts reads, 0 within-phase, 0 cache hits, gain
+   meter "0 saved" at 49% read adoption). The product's cache and the harness's
+   phase isolation monetize the same redundancy; the harness gets there first.
+   Residual product bugs: cep.sessions=0 with confirmed cache hits (meter
+   attribution); ctx_shell/grep/ls/find still one-shot CLI. Maintainer engaged
+   in [lean-ctx#361](https://github.com/yvgude/lean-ctx/issues/361); fixes
+   enter via numbered protocol amendments.
 5. **The payment rail decides which optimizations matter**: on Anthropic pricing,
    caching saved ~$4.80/run (a0c measured) — ~14× the largest middleware effect.
    Prefix stability is the dominant economic lever; on request-metered
@@ -48,7 +56,7 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
    but ±50% per phase → single-run benchmarks cannot detect sub-5% effects.
    Hence the A0×5 matrix design.
 8. **Completion reliability is a cost dimension of its own.** Orchestration runs
-   complete 6/6 without lean-ctx in context; with lean-ctx loaded, 2 of 5
+   complete 6/6 without lean-ctx in context; with lean-ctx loaded, 2 of 6
    plan-phase executions halted on workflow-compliance failures (s374: agent did
    the engineering but dropped the artifact choreography — plan emitted as chat
    text; `set-summary` skipped). NOT attributable to version 3.7.4: the
@@ -56,15 +64,17 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
    passed. The mechanism is structural — injected MANDATORY rules compete with
    the harness's own workflow for the model's compliance budget, and the gates
    correctly halt when the harness's choreography loses. The a1f addendum
-   (routing + explicit "never alter the step" guard) completed 1/1; guard-vs-luck
-   is unresolved at this n. The a1m×3 matrix reps decide whether stock completion
-   failure is systematic — if it recurs, completion rate becomes a headline
-   metric; if not, s374 is demoted to stochastic and this row will say so.
+   (routing + explicit "never alter the step" guard) completed 1/1; s375 (3.7.5
+   stock) completed 8/8 with gates green — first stock-config completion since
+   the pilot, consistent with s374-as-stochastic but n remains too small. The
+   a1m×3 matrix reps decide whether stock completion failure is systematic — if
+   it recurs, completion rate becomes a headline metric; if not, s374 is demoted
+   to stochastic and this row will say so.
 
 ## Vendor engagement log
 
 | Vendor | Issue | State |
 |---|---|---|
-| lean-ctx | [#361](https://github.com/yvgude/lean-ctx/issues/361) | ACTIVE: mcp.json bug → 3.7.4 (A1); read-path finding confirmed "genuine bug" → **3.7.5** (~7h turnaround, bridge default-on, ctx_read→bridge) → **Amendment A2**, arm a1m:1.2 verified (re-reads 28/69 chars, gain 1.9K/65.5% on stock config — cache mechanism real on pi for the first time); residuals: cep.sessions=0 persists (meter attribution), ctx_shell/grep/ls/find still one-shot CLI, additive-vs-replace still undesignated; maintainer offered quotable statement |
+| lean-ctx | [#361](https://github.com/yvgude/lean-ctx/issues/361) | ACTIVE: mcp.json bug → 3.7.4 (A1); read-path finding confirmed "genuine bug" → **3.7.5** (~7h turnaround, bridge default-on, ctx_read→bridge) → **Amendment A2**, arm a1m:1.2 verified (re-reads 28/69 chars — cache mechanism real on pi for the first time); s375 shakedown run: 8/8 complete, 49% read adoption stock, gain still "0 saved" — cache per-server-process × phase-per-process harness = zero cache surface (probe-verified); residuals: cep.sessions=0 persists (meter attribution), ctx_shell/grep/ls/find still one-shot CLI, additive-vs-replace undesignated; run findings NOT yet posted to thread; maintainer offered quotable statement |
 | rtk | [#2292](https://github.com/rtk-ai/rtk/issues/2292) | filed, no response yet |
 | headroom | [#645](https://github.com/chopratejas/headroom/issues/645) | filed, no response yet |
