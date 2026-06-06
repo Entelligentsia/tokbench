@@ -203,6 +203,6 @@ defaults materially change results (full mechanism analysis in
 | Path | Contents |
 |---|---|
 | `bench/` | Dockerfiles, compose, runner/harvest scripts, pins, frozen protocol |
-| `results/` | raw per-run transcripts (primary data), summaries, manifests, product self-metrics, quota logs |
+| `results/` | raw per-run transcripts (primary data), summaries, manifests, product self-metrics, quota logs — [**run ledger**](results/INDEX.md) |
 | `notes/` | lab notebook: infrastructure, run analyses, per-product integration findings, publication checklist |
 | `casts/` | asciinema recordings of runs (replayed from preserved containers) |

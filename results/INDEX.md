@@ -1,0 +1,57 @@
+# tokbench Run Ledger
+
+One row per run, chronological. Every number from provider-reported usage in the
+harness transcripts (`<run>/transcripts/`). Deep analysis: [`notes/02-run1-results.md`](../notes/02-run1-results.md).
+Status legend: **PILOT** (pre-protocol exploratory, disclosed as priors) ·
+**EXPLORATORY** (post-protocol, outside the 14-run matrix) · **VOID** (failed
+validity, published per protocol §5) · **MATRIX** (publication dataset — not yet run).
+
+| # | Run | Date (UTC) | Arm / condition | Image | Input tokens | Turns | Model time | Status | Headline |
+|---|---|---|---|---|---:|---:|---:|---|---|
+| 0 | [VOID-a0-T-fix-r1-failed-0.2](VOID-a0-T-fix-r1-failed-0.2/) | 06-05 | A0 native (aborted) | base:0.2 | — | — | — | VOID | tools/package.json bug aborted collate; led to base-image fix worth ~100–140K/run |
+| 1 | [a0-T-fix-r1](a0-T-fix-r1/) | 06-05 | A0 native baseline | base:0.4 | **2,276,305** | 180 | 8.5m | PILOT | The anchor. 5 errs, gates green. Tool output ≈26% of context = middleware ceiling |
+| 2 | [a1-T-fix-r1](a1-T-fix-r1/) | 06-05 | lean-ctx 3.7.3 as-shipped (CLI one-shot) | arm-a1:0.2 | **3,622,684** (+59%) | 225 | 25.6m (3.0×) | PILOT | Core feature (cache) disabled by default; ctx_read payloads LARGER than source. Dropped from matrix |
+| 3 | [a1m-T-fix-r1](a1m-T-fix-r1/) | 06-05 | lean-ctx 3.7.3 + MCP bridge (vendor-intended) | arm-a1m:0.2 | **3,135,311** (+38%) | 179 | 12.6m (1.5×) | PILOT | Bridge gate-confirmed connected; vendor's own meter: "0 saved · $-0.001"; 11 ctx_* calls (~9% adoption) |
+| 4 | [a3-T-fix-r1](a3-T-fix-r1/) | 06-05 | rtk 0.42.2 (pi tool_call rewrite) | arm-a3:0.1 | **2,888,527** (+27%) | 201 | 14.2m | PILOT | rtk worked as designed (74 rewrites, 74.7% saved on touched) — but touched slice ≈2.5% of spend; +27% = path variance |
+| 5 | [a2-T-fix-r1](a2-T-fix-r1/) | 06-05 | headroom v0.23 proxy (wire-level) | arm-a2:0.1 + sidecar | **3,244,460** (+43%) | 237 | 14.5m | PILOT | ONLY genuine on-wire saver: −342K verified against bill to 0.0004%; run path longer (237 turns) ate the saving |
+| 6 | [a0v-T-fix-base1.0](a0v-T-fix-base1.0/) | 06-05 | A0 on reproducible base (validation) | base:1.0 | **2,246,787** (−1.3%) | 172 | 10.8m | PILOT | Certifies base:1.0 + env-key auth; total-level reproducibility ±1.3%, per-phase swings ±50% |
+| 7 | [c0-T-fix-claude-r1](c0-T-fix-claude-r1/) | 06-05 | Claude Code + forge plugin (apples-to-ORANGE) | host CC | **8,685,243 fed** (93% cache reads) | 391 msgs | ~18m | EXPLORATORY | $6.09 measured. Same task, agent-loop architecture: 3.8× token volume vs 4ge |
+| 8 | [a0c-T-fix-r1](a0c-T-fix-r1/) | 06-06 | 4ge native on Anthropic models (cache economics) | arm-a0c:1.0-auth | **1,672,470 input-side** (92.1% cache reads, 261 fresh) | 108 | 11.1m wall | EXPLORATORY | **$1.82 actual vs $1.81 projected.** 3.3× cheaper than Claude Code; caching saved ~72% (~$4.80) — ~14× the best middleware effect |
+| 9 | [a1m-T-fix-s374](a1m-T-fix-s374/) | 06-06 | lean-ctx 3.7.4 stock shakedown | arm-a1m:1.1 | (2 aborted attempts, ~437K burned) | 31 | — | VOID | Plan phase 0-for-2, two distinct workflow-compliance failures (plan-as-chat-"article"; set-summary skipped). Steering delta ruled out (surface byte-identical) |
+| 10 | [a1f-T-fix-r1](a1f-T-fix-r1/) | 06-06 | lean-ctx 3.7.4 + forge-routing addendum (adoption ceiling) | arm-a1f:0.1 | **2,607,368** (+14.5%) | 163 | 8.1m | EXPLORATORY | Adoption 3× (37% of reads); gain meter first-nonzero: "921 saved · $0.02". **ctx_read runs one-shot CLI even with bridge connected (cep.sessions=0, 3rd run) → cached re-read structurally unreachable on pi** |
+| 11–24 | — | post weekly reset | 14-run matrix: A0×5, a1m×3 (arm-a1m:1.1), a2×3, a3×3 | 1.0-gen images | | | | MATRIX | Publication dataset. Frozen order in [PROTOCOL §3](../bench/PROTOCOL.md); claim rule: arm median outside A0×5 range |
+
+## Standing conclusions (as of 2026-06-06, pre-matrix)
+
+1. **No middleware beat native on billed tokens** in any pilot or exploratory run.
+   Best case (a1f, maximum legitimate adoption): still +14.5%.
+2. **Headroom is the only product with verified genuine on-wire compression**
+   (−342K, ledger-exact vs the bill) — whether it nets out per-run is what the
+   matrix answers.
+3. **rtk works exactly as designed; its addressable surface here (~2.5%) is below
+   the noise floor.** Architecture–surface fit, not product quality.
+4. **lean-ctx on pi cannot currently deliver its core mechanism**: the read path
+   never reaches the bridge session cache (3 runs, cep.sessions=0), 3.7.4's
+   adoption steering is deduped off the pi path, and as-shipped defaults disable
+   the bridge entirely. Maintainer engaged in
+   [lean-ctx#361](https://github.com/yvgude/lean-ctx/issues/361); fixes enter via
+   numbered protocol amendments.
+5. **The payment rail decides which optimizations matter**: on Anthropic pricing,
+   caching saved ~$4.80/run (a0c measured) — ~14× the largest middleware effect.
+   Prefix stability is the dominant economic lever; on request-metered
+   ollama-cloud, none of the cache-side effects exist.
+6. **Harness architecture dominates middleware**: 4ge's phase isolation +
+   governed tools leave ~26% of context addressable; the same task on an
+   agent-loop harness (Claude Code) fed 3.8× the tokens. The biggest context
+   optimization in this study is the harness, not any middleware.
+7. **Noise floor**: identical native runs reproduce within ±1.3% at total level
+   but ±50% per phase → single-run benchmarks cannot detect sub-5% effects.
+   Hence the A0×5 matrix design.
+
+## Vendor engagement log
+
+| Vendor | Issue | State |
+|---|---|---|
+| lean-ctx | [#361](https://github.com/yvgude/lean-ctx/issues/361) | ACTIVE: mcp.json bug confirmed + fixed in 3.7.4 (~2h turnaround) → Amendment A1; our follow-up delivered read-path/cep=0 mechanism + steering-inert + adoption-ceiling findings; awaiting read-path answer & additive-vs-replace designation |
+| rtk | [#2292](https://github.com/rtk-ai/rtk/issues/2292) | filed, no response yet |
+| headroom | [#645](https://github.com/chopratejas/headroom/issues/645) | filed, no response yet |

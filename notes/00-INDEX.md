@@ -7,6 +7,7 @@ Pins: `../bench/pins.env` · Results: `../results/` · Arm Dockerfiles: `../benc
 
 | Note | Contents |
 |---|---|
+| [../results/INDEX.md](../results/INDEX.md) | **RUN LEDGER — one row per run: image, numbers, status, headline; standing conclusions; vendor log. Start here.** |
 | [01-infrastructure.md](01-infrastructure.md) | Image lineage, build gotchas, run commands, harvest contract, analysis jq snippets |
 | [02-run1-results.md](02-run1-results.md) | A0 vs A1 full data + mechanism analysis (the +59%/3× finding) |
 | [03-product-integration-notes.md](03-product-integration-notes.md) | lean-ctx pi internals; rtk + headroom efficient-setup research; per-product gotchas |
