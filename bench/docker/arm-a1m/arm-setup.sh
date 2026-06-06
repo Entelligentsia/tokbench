@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# a1m arm-setup — lean-ctx project rules + ensure embedded MCP bridge engages:
-# init writes ~/.pi/agent/mcp.json (an MCP adapter config); pi has NO mcp adapter,
-# yet its presence makes the extension disable its own bridge. Remove it so
-# LEAN_CTX_PI_ENABLE_MCP=1 starts the embedded bridge (persistent server).
+# a1m arm-setup — re-apply lean-ctx project rules after golden reset.
+# Amendment A1: on 3.7.4 LEAN_CTX_PI_ENABLE_MCP=1 starts the embedded bridge
+# regardless of mcp.json (flag wins), so the old rm-mcp.json workaround is gone.
+# Gate at session start remains: /lean-ctx must show "MCP bridge: embedded (connected)".
 set -euo pipefail
 cd /home/bench/forge-testbench/cartographer
 lean-ctx init --agent pi >/dev/null 2>&1
-rm -f ~/.pi/agent/mcp.json .pi/mcp.json
-echo "  ✓ arm-a1m: lean-ctx rules re-applied; stale mcp.json removed (embedded bridge will engage)"
+echo "  ✓ arm-a1m: lean-ctx rules re-applied (3.7.4, embedded bridge via env flag)"

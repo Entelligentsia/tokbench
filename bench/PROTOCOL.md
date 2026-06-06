@@ -120,4 +120,27 @@ are about architecture–surface fit and as-shipped integration behavior on this
 
 ## Amendments
 
-(none)
+### A1 — lean-ctx 3.7.4 for the a1m arm (2026-06-06, pre-replication)
+
+**Trigger:** maintainer response in
+[yvgude/lean-ctx#361](https://github.com/yvgude/lean-ctx/issues/361)
+(2026-06-05/06). Maintainer confirmed the 3.7.3 behavior we worked around
+(`init --agent pi` writes `~/.pi/agent/mcp.json`; extension treats it as an
+external adapter and disables the embedded bridge even with
+`LEAN_CTX_PI_ENABLE_MCP=1`) as a bug, fixed in **3.7.4** (explicit flag now
+wins), released on all channels.
+
+**Changes (a1m arm only):**
+1. Pin lean-ctx **3.7.4** (was 3.7.3); vendored binary + sha256 updated in
+   `bench/pins.env`; image rebuilt as `tokbench-arm-a1m:1.1`.
+2. Drop the `rm ~/.pi/agent/mcp.json` workaround from the Dockerfile and
+   `arm-setup.sh` (no longer needed per maintainer; 3.7.4 flag-wins behavior
+   is the configuration under test).
+3. Pre-run gate unchanged: `/lean-ctx` must report
+   `MCP bridge: embedded (connected)` with a non-zero tool count before the
+   task invocation; otherwise VOID per §5.
+
+**Unchanged:** run matrix, order, metrics, validity rules, all other arms.
+Mode question (additive vs replace) posed to maintainer in #361; if maintainer
+designates replace mode as the savings-faithful configuration, that will enter
+as a further numbered amendment before the affected runs.

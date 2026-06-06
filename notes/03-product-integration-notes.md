@@ -28,6 +28,29 @@ path. Each product was audited for equivalent gotchas BEFORE its arm runs.
 State paths (v3.7.3, XDG — research notes saying ~/.lean-ctx are STALE):
 ~/.config/lean-ctx/ (stats.json) · ~/.local/share/lean-ctx/.
 
+### Maintainer response → 3.7.4 (Amendment A1, 2026-06-06)
+
+lean-ctx#361: maintainer (yvgude) confirmed the mcp.json TRAP as a bug, fixed in
+**3.7.4** (released all channels within ~2h): explicit LEAN_CTX_PI_ENABLE_MCP=1 now
+wins over init-written mcp.json; /lean-ctx warns about duplicates only when
+pi-mcp-adapter actually runs. Confirmed by-design: one-shot CLI default has no
+cross-call cache (points 1+3 of our report stand). Asked for a confirmed-connected
+re-run before June 17; offered maintainer statement.
+
+Our counter-evidence posted (issuecomment-4636817950): pilot a1m WAS gate-confirmed
+connected, yet transcripts show only **11 ctx_* calls vs 43 read + 69 bash (~9%
+adoption; 3 ctx_reads, zero re-reads)** → "0 saved" is arithmetically honest; binding
+constraint = voluntary adoption in additive mode, not bridge function. Open puzzle
+handed to maintainer: stats.json logged those 11 calls as `cli_*` types with
+cep.sessions=0/cache_hits=0 despite "connected" status — meter mislabeling or
+CLI-path fallback? Also flagged: a1 (one-shot) got 46 ctx_* calls vs a1m's 11 —
+bridge-on REDUCED adoption (no explanation yet). Asked maintainer to designate
+additive vs replace as the savings-faithful mode; their answer → further amendment.
+
+**Replication arm: tokbench-arm-a1m:1.1** (lean-ctx 3.7.4 + pi-lean-ctx@3.7.4,
+rm-mcp.json workaround DROPPED — flag-wins is the config under test). Pre-run
+connected gate unchanged.
+
 ## rtk 0.40.0 on pi (a3 — image not yet built)
 
 **No degraded-path risk:** filter registry (~70 command patterns, src/discover/rules.rs)
