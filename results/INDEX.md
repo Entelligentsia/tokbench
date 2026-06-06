@@ -40,6 +40,11 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
    (s375: 5 cross-phase graph.ts reads, 0 within-phase, 0 cache hits, gain
    meter "0 saved" at 49% read adoption). The product's cache and the harness's
    phase isolation monetize the same redundancy; the harness gets there first.
+   This is not fixable client-side: the ~13-token stub is a back-reference into
+   the conversation, valid only when the model already holds the file in the
+   same context — a fresh phase context must be sent the full payload, and the
+   provider bills what is sent. Only provider-side prompt caching saves tokens
+   across contexts (see conclusion 5).
    Residual product bugs: cep.sessions=0 with confirmed cache hits (meter
    attribution); ctx_shell/grep/ls/find still one-shot CLI. Maintainer engaged
    in [lean-ctx#361](https://github.com/yvgude/lean-ctx/issues/361); fixes

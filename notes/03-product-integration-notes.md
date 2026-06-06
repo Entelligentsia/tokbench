@@ -154,6 +154,22 @@ lean-ctx cache monetize the same redundancy (cross-context re-reads); on a
 harness that already eliminates it at the architecture level, the cache surface
 is structurally zero — under ANY configuration, with every product bug fixed.**
 
+**Why no client-side fix can change this (anticipates "ship a disk-backed
+cache"):** the stub (`F1=graph.ts [unchanged 113L]`) is not content — it is a
+back-reference into the conversation, valid only because the model already
+holds the full file as F1 earlier in the SAME context window. A fresh phase
+agent has a fresh context; serving it the stub would hand it a pointer to
+nothing. The full payload must be sent to a fresh context, and the provider
+bills the tokens actually sent — the billable floor for a fresh context is the
+content it needs, and no client-side cache can go below it. Persisting the
+cache across processes would change nothing here. lean-ctx's cache and forge's
+phase isolation are two implementations of the same optimization — don't
+re-pay for redundancy within a long-lived context: lean-ctx dedups re-reads
+inside one long conversation; forge deletes the long conversation and hands
+the next phase a distilled artifact instead. The only mechanism that saves
+tokens ACROSS contexts is provider-side prompt caching (a0c: ~$4.80/run on
+Anthropic) — because the provider holds the prefix, not the client.
+
 Corollary: with zero cache payback, every adopted ctx_read is a one-shot read
 with envelope overhead (~4.1K served vs 3.6K source on graph.ts) — so the
 steering fix that took read adoption from 9% to 49% *increases* cost on this harness.
