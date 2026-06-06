@@ -47,6 +47,19 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
 7. **Noise floor**: identical native runs reproduce within ±1.3% at total level
    but ±50% per phase → single-run benchmarks cannot detect sub-5% effects.
    Hence the A0×5 matrix design.
+8. **Completion reliability is a cost dimension of its own.** Orchestration runs
+   complete 6/6 without lean-ctx in context; with lean-ctx loaded, 2 of 5
+   plan-phase executions halted on workflow-compliance failures (s374: agent did
+   the engineering but dropped the artifact choreography — plan emitted as chat
+   text; `set-summary` skipped). NOT attributable to version 3.7.4: the
+   model-visible surface was proven byte-identical to the 3.7.3 pilot that
+   passed. The mechanism is structural — injected MANDATORY rules compete with
+   the harness's own workflow for the model's compliance budget, and the gates
+   correctly halt when the harness's choreography loses. The a1f addendum
+   (routing + explicit "never alter the step" guard) completed 1/1; guard-vs-luck
+   is unresolved at this n. The a1m×3 matrix reps decide whether stock completion
+   failure is systematic — if it recurs, completion rate becomes a headline
+   metric; if not, s374 is demoted to stochastic and this row will say so.
 
 ## Vendor engagement log
 
