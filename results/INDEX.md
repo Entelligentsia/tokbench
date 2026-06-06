@@ -65,6 +65,6 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
 
 | Vendor | Issue | State |
 |---|---|---|
-| lean-ctx | [#361](https://github.com/yvgude/lean-ctx/issues/361) | ACTIVE: mcp.json bug confirmed + fixed in 3.7.4 (~2h turnaround) → Amendment A1; our follow-up delivered read-path/cep=0 mechanism + steering-inert + adoption-ceiling findings; awaiting read-path answer & additive-vs-replace designation |
+| lean-ctx | [#361](https://github.com/yvgude/lean-ctx/issues/361) | ACTIVE: mcp.json bug → 3.7.4 (A1); read-path finding confirmed "genuine bug" → **3.7.5** (~7h turnaround, bridge default-on, ctx_read→bridge) → **Amendment A2**, arm a1m:1.2 verified (re-reads 28/69 chars, gain 1.9K/65.5% on stock config — cache mechanism real on pi for the first time); residuals: cep.sessions=0 persists (meter attribution), ctx_shell/grep/ls/find still one-shot CLI, additive-vs-replace still undesignated; maintainer offered quotable statement |
 | rtk | [#2292](https://github.com/rtk-ai/rtk/issues/2292) | filed, no response yet |
 | headroom | [#645](https://github.com/chopratejas/headroom/issues/645) | filed, no response yet |

@@ -144,3 +144,37 @@ wins), released on all channels.
 Mode question (additive vs replace) posed to maintainer in #361; if maintainer
 designates replace mode as the savings-faithful configuration, that will enter
 as a further numbered amendment before the affected runs.
+
+### A2 — lean-ctx 3.7.5 for the a1m arm (2026-06-06, pre-replication; supersedes A1)
+
+**Trigger:** maintainer response in
+[yvgude/lean-ctx#361](https://github.com/yvgude/lean-ctx/issues/361)
+(2026-06-06, v3.7.5 released 11:11 UTC). Maintainer confirmed our structural
+finding — the pi extension's read tools (`ctx_read`/`ctx_shell`/`ctx_grep`/
+`ctx_ls`/`ctx_find`) spawned one-shot CLI subprocesses on every call, bridge
+or no bridge, so reads never touched the bridge-resident session cache and
+`cep.sessions`/`total_cache_hits` stayed 0 in every bridge-connected run —
+as a genuine bug, fixed in **3.7.5**: the embedded bridge is now **on by
+default**, and every `ctx_read` (including line-range reads) routes through
+it with a CLI fallback. The #168 "Prefer over native…" steering is now
+carried by the pi extension's own tool descriptions.
+
+**Changes (a1m arm only):**
+1. Pin lean-ctx **3.7.5** (was 3.7.4); vendored binary + sha256 updated in
+   `bench/pins.env` (verified against the release's published SHA256SUMS);
+   pi-lean-ctx npm pin **3.7.5**; image rebuilt as `tokbench-arm-a1m:1.2`.
+2. Drop `LEAN_CTX_PI_ENABLE_MCP=1` from the Dockerfile — the configuration
+   under test is the **as-shipped 3.7.5 default** (bridge default-on),
+   matching the maintainer's designated savings-faithful configuration.
+3. Pre-run gate unchanged: `/lean-ctx` must report
+   `MCP bridge: embedded (connected)` with a non-zero tool count before the
+   task invocation; otherwise VOID per §5.
+4. Post-run check added: `stats.json` is harvested as before; whether
+   `cep.sessions` / `total_cache_hits` go non-zero is now a **finding**, not
+   a validity condition (the maintainer's fix predicts non-zero on repeated
+   reads).
+
+**Unchanged:** run matrix, order, metrics, validity rules, all other arms.
+The additive-vs-replace question remains open with the maintainer; the
+exploratory a1f (adoption-ceiling) arm definition is unaffected and remains
+exploratory, outside the confirmatory matrix.

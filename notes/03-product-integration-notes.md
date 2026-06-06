@@ -73,6 +73,52 @@ Research question unaffected (we test the current maintainer-blessed product); r
 internal comparisons clean (all a1m reps on 3.7.4). Harness-side structure (≈26%
 addressable surface, forge-tool invisibility, phase isolation) unchanged by any of this.
 
+### Maintainer response → 3.7.5 (Amendment A2, 2026-06-06) — read-path fix VERIFIED, with caveats
+
+lean-ctx#361: maintainer confirmed our structural read-path finding ("findings 1 and 2
+are correct and are genuine bugs") and shipped **3.7.5** (11:11 UTC, ~7h after our
+report): embedded bridge ON BY DEFAULT (`enableMcp !== false`, config.ts:106-109;
+opt-out `LEAN_CTX_PI_ENABLE_MCP=0`), ctx_read routed through the bridge session.
+Issue auto-closed by the release commit's `fix #361`, maintainer reopened (it's a
+review request). Offered verbatim statement for the writeup (in-thread, quotable).
+
+**Our verification (fresh arm-a1m:1.2 image, MCP probe replicating the bridge
+handshake — binary, no args, LEAN_CTX_COMPRESS=1, stdio JSON-RPC):**
+- ✅ **The core mechanism now exists on pi.** ctx_read full of graph.ts (3,627 B):
+  first read 4,127 chars (envelope overhead stands, by-design per maintainer);
+  re-reads collapse to **28 chars** (`F1=graph.ts [unchanged 113L]`) and 69 chars —
+  the ~13-token cached re-read is REAL on this path for the first time.
+- ✅ Stock-config gain meter nonzero for the first time: **1.9K saved · 65.5% ·
+  $0.007** from a 3-read probe. Stats labeling fixed: commands log as `ctx_read`
+  (was `cli_full`).
+- ✅ Extension code confirms routing: `mcpBridge.callTool("ctx_read", …)` with CLI
+  fallback (pi-lean-ctx 3.7.5 index.ts:505,551). Steering now agent-visible on pi:
+  all five read tools carry "Prefer over native…" in extension descriptions
+  (finding-3 surface fixed).
+- ⚠️ **Partial fix:** `callTool` appears exactly twice, both ctx_read. ctx_shell /
+  ctx_grep / ctx_ls / ctx_find still spawn one-shot CLI subprocesses — outside the
+  session cache. Maintainer's claim ("every ctx_read routes through it") is accurate
+  but narrower than "the read path."
+- ⚠️ **cep.sessions=0 persists** (4th time), now WITH demonstrated cache hits and a
+  graceful server shutdown (exit 0). Savings book under compression accounting;
+  companion breakdown shows "cache 0%". Maintainer's "register as real CEP sessions /
+  cep.sessions should now be non-zero" does NOT reproduce. Meter-attribution issue,
+  not a function issue — but it means `stats.json cep.*` still can't be used as the
+  cache-engagement metric for the runs; per-call payload sizes from transcripts remain
+  the only trustworthy measure.
+
+**Version confound (smaller than 3.7.4's):** v3.7.4..v3.7.5 = 86 files, +4,125/−152,
+10 commits. #361 fixes = 145925330 (ctx_read→bridge) + c495f4c2a (default-on +
+steering). Also ships ctx_url_read ("Web & Research", 69-tool surface) — new tools
+visible to the agent, could shift tool choice; same inference rule as A1 applies.
+
+**Replication arm: tokbench-arm-a1m:1.2** (22d12cdd608e; lean-ctx 3.7.5 +
+pi-lean-ctx@3.7.5, NO env var — as-shipped default-on is the config under test;
+mcp.json left as init writes it). Pre-run connected gate unchanged. Amendment A2
+committed to PROTOCOL.md; supersedes A1 for a1m runs. Still open with maintainer:
+additive-vs-replace designation; now also the cep-meter attribution and the
+four still-CLI read tools.
+
 ## rtk 0.40.0 on pi (a3 — image not yet built)
 
 **No degraded-path risk:** filter registry (~70 command patterns, src/discover/rules.rs)
