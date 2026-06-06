@@ -272,3 +272,18 @@ Three different default-path failure classes:
 2. /forge:init materializes .forge/tools/ without its package.json ({"type":"commonjs"})
    → lib/result.js (CJS .js) crashes all tools under "type":"module" projects; collate
    silently broken during runs. One-line fix per project.
+
+### Side-analysis: commit-phase cost anatomy (2026-06-06) → forge-engineering#40
+
+Commit is the costliest phase on the metered provider (15–31% of run input, 9
+runs): highest per-turn context (~22–23K vs 13–17K) × most turns. Tool output
+is negligible (~9K tokens of s375's 1.22M) — cost = turns × context re-pay.
+Choreography floor ≈19 turns (sonnet, a0c); glm-4.7 runs 25–55 with three
+identified flail loops (premature-commit redo, phaseSummary schema hunt,
+staging-policy confusion — the last present even in native runs). Model is the
+multiplier, not the base. **Writeup relevance: commit flail is the largest
+single contributor to run-total noise — s375's +76% was ~half commit-phase
+flail — reinforcing the ±50%-per-phase noise floor and the A0×5 matrix
+design.** Harness fixes (prompt-level, post-publication: staging policy +
+inline phaseSummary template + batched diffs) filed as
+Entelligentsia/forge-engineering#40.
