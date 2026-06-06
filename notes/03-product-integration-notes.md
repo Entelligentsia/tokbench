@@ -51,6 +51,28 @@ additive vs replace as the savings-faithful mode; their answer → further amend
 rm-mcp.json workaround DROPPED — flag-wins is the config under test). Pre-run
 connected gate unchanged.
 
+### ⚠ 3.7.4 is a major release, not a one-line fix — version confound (writeup MUST state)
+
+v3.7.3..v3.7.4 = 132 files, +7,667/−2,135. The #361 fix (pi ext index.ts, 21 lines)
+rides a release already in flight. On our measurement path:
+- **94643ed9 (#168): tool-description steering** — front-loads "Prefer over native
+  Read/cat…" in line 1 of every native-competing tool description. Commit message
+  names the exact failure mode our pilot measured (agents defaulting to native tools,
+  9% adoption). Built to move our binding constraint.
+- **cc5ea741/5369cea1: ctx_read session-cache rework + lazy-startup perf pass** —
+  latency + cache path of the a1m arm.
+- never-inflate fix (5dfd861d) is NOT a fix for our envelope finding — it repairs a
+  within-cycle regression (task-conditioned entropy refactor). Header tax on small
+  files stands; maintainer conceded by design.
+- rules_injection=dedicated (#343): default stays `shared` → our arm-setup unchanged.
+  Verified: injected rules byte-identical 1.0 vs 1.1 (AGENTS.md 166B, LEAN-CTX.md 2,530B).
+
+**Inference rule:** pilot-a1m (3.7.3) vs rep-a1m (3.7.4) deltas are VERSION deltas —
+bridge fix, adoption steering, and perf changes move together; no per-cause attribution.
+Research question unaffected (we test the current maintainer-blessed product); rep-vs-rep
+internal comparisons clean (all a1m reps on 3.7.4). Harness-side structure (≈26%
+addressable surface, forge-tool invisibility, phase isolation) unchanged by any of this.
+
 ## rtk 0.40.0 on pi (a3 — image not yet built)
 
 **No degraded-path risk:** filter registry (~70 command patterns, src/discover/rules.rs)
