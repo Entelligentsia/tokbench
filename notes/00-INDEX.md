@@ -12,6 +12,7 @@ Pins: `../bench/pins.env` · Results: `../results/` · Arm Dockerfiles: `../benc
 | [02-run1-results.md](02-run1-results.md) | A0 vs A1 full data + mechanism analysis (the +59%/3× finding) |
 | [03-product-integration-notes.md](03-product-integration-notes.md) | lean-ctx pi internals; rtk + headroom efficient-setup research; per-product gotchas |
 | [04-publication-readiness.md](04-publication-readiness.md) | Research-grade requirements: reproducible base:1.0, pre-registered protocol, COI/scope/right-of-reply, honest-results discipline. **Run-1 = pilot; reps = publication dataset.** |
+| [05-architecture-comparison.md](05-architecture-comparison.md) | c0 (Claude Code) vs a0c (4ge) on Anthropic rail: dollar anatomy ($6.09 vs $1.82, both bill-exact), 5.2× fed-token delta at equal output, **system-prompt weight metric** (boot 29.3K vs 10.2K; carriage ≈63% of fed tokens in BOTH harnesses) |
 
 ## State as of 2026-06-05 evening
 

@@ -55,8 +55,15 @@ validity, published per protocol §5) · **MATRIX** (publication dataset — not
    ollama-cloud, none of the cache-side effects exist.
 6. **Harness architecture dominates middleware**: 4ge's phase isolation +
    governed tools leave ~26% of context addressable; the same task on an
-   agent-loop harness (Claude Code) fed 3.8× the tokens. The biggest context
-   optimization in this study is the harness, not any middleware.
+   agent-loop harness (Claude Code) fed 3.8× the tokens (5.2× vs 4ge on the
+   same Anthropic rail, at near-equal output tokens — the work is the same
+   size; the delta is context carriage). System-prompt weight: CC main loop
+   boots at 29.3K vs 10.2K mean for a 4ge phase, and preamble carriage is
+   ~63% of all fed tokens in BOTH harnesses — architecture decides the
+   absolute volume, not the overhead share. Full dollar anatomy (bill-exact
+   $6.09 vs $1.82): [notes/05](../notes/05-architecture-comparison.md). The
+   biggest context optimization in this study is the harness, not any
+   middleware.
 7. **Noise floor**: identical native runs reproduce within ±1.3% at total level
    but ±50% per phase → single-run benchmarks cannot detect sub-5% effects.
    Hence the A0×5 matrix design.
