@@ -13,6 +13,13 @@ Pins: `../bench/pins.env` · Results: `../results/` · Arm Dockerfiles: `../benc
 | [03-product-integration-notes.md](03-product-integration-notes.md) | lean-ctx pi internals; rtk + headroom efficient-setup research; per-product gotchas |
 | [04-publication-readiness.md](04-publication-readiness.md) | Research-grade requirements: reproducible base:1.0, pre-registered protocol, COI/scope/right-of-reply, honest-results discipline. **Run-1 = pilot; reps = publication dataset.** |
 | [05-architecture-comparison.md](05-architecture-comparison.md) | c0 (Claude Code) vs a0c (4ge) on Anthropic rail: dollar anatomy ($6.09 vs $1.82, both bill-exact), 5.2× fed-token delta at equal output, **system-prompt weight metric** (boot 29.3K vs 10.2K; carriage ≈63% of fed tokens in BOTH harnesses) |
+| [06-what-models-want.md](06-what-models-want.md) | **What models really want from tool output — 6-model SYNTHESIS** (Opus 4.8 / GLM-5.1 / MiniMax M27 / DeepSeek V4 Pro / Gemini 3 Flash / Gemma4-31B): 6 consensus findings (incl. *ambiguity governs prior-vs-posterior*), pattern-vs-intent spectrum, **11 consolidated testable hypotheses**, contamination caveats |
+| ├ [06-…-opus-4.8-cc.md](06-what-models-want-opus-4.8-cc.md) | Opus 4.8 (Claude Code): no-parse consumption, surprisal-preserving compression, read/write format split, confessed transformations → hypotheses 1–5 |
+| ├ [06-…-glm-5.1-pi.md](06-what-models-want-glm-5.1-pi.md) | GLM-5.1 (pi): perceptual compressive cascade, intent-lensing, over-normalisation ("normalise away the truth"), pragmatic meta → hypotheses 6–7 |
+| ├ [06-…-minimax-m27-pi.md](06-what-models-want-minimax-m27-pi.md) | MiniMax M27 (pi): provider comparison table, "pattern matchers with great fluency", status fields often ignored, ideal-schema proposal → hypothesis 8 (via 3-way disagreement) |
+| ├ [06-…-deepseek-v4-pro-pi.md](06-what-models-want-deepseek-v4-pro-pi.md) | DeepSeek V4 Pro (pi): **inspected Pi internals** — `details` (exitCode/truncated) stripped before model; 4 normalization layers incl. lean-ctx pipeline; "harness is the architect of the LLM's reality" → hypothesis 9 |
+| ├ [06-…-gemini-3-flash-preview-pi.md](06-what-models-want-gemini-3-flash-preview-pi.md) | Gemini 3 Flash (pi): tool result as correction vector; **trust asymmetry** (tool channel = "Environment Truth") → hypothesis 11; salience refraction |
+| └ [06-…-gemma4-31b-pi.md](06-what-models-want-gemma4-31b-pi.md) | Gemma4-31B (pi): pattern→mode, intent→validation two-stage; "today's response must override the pattern"; MCP as emerging meta-standard |
 
 ## State as of 2026-06-05 evening
 
