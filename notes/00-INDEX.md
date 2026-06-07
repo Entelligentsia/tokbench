@@ -21,7 +21,19 @@ Pins: `../bench/pins.env` · Results: `../results/` · Arm Dockerfiles: `../benc
 | ├ [06-…-gemini-3-flash-preview-pi.md](06-what-models-want-gemini-3-flash-preview-pi.md) | Gemini 3 Flash (pi): tool result as correction vector; **trust asymmetry** (tool channel = "Environment Truth") → hypothesis 11; salience refraction |
 | └ [06-…-gemma4-31b-pi.md](06-what-models-want-gemma4-31b-pi.md) | Gemma4-31B (pi): pattern→mode, intent→validation two-stage; "today's response must override the pattern"; MCP as emerging meta-standard |
 
-## State as of 2026-06-05 evening
+## State as of 2026-06-07 evening (post matrix R01–R04)
+
+- ✅ **Matrix R01 (A0)**: 2,183,153 input, 159 turns — first publication anchor; −2.8% vs a0v validation, within noise
+- ✅ **Matrix R02 (a1m 3.7.5)**: 3,015,055 (+38.1% vs R01 A0), 162 turns — 3.7.5 steering effective (58 ctx_* calls, 5× pilot); overhead consistent with pilot; gain metrics not harvested (XDG path miss — fix harvest before r3)
+- ✅ **Matrix R03 (a2 headroom)**: **1,944,790 (−10.9% vs R01 A0)** — FIRST NEGATIVE; headroom genuine −151,192 (7.21%); meters exact; CCR 0 entries (no CCR active despite one headroom_retrieve call observed)
+- ✅ **Matrix R04 (a3 rtk)**: 2,147,541 (−1.6% vs R01 A0), 162 turns — 54 rewrites, 75.7% on touched = 1.4% of total; within noise floor; consistent with pilot
+- ⬜ 10 matrix runs remain: A0×4, a1m×2, a2×2, a3×2 — next R05=A0 after weekly reset
+- ⚠ **Commit phase variance observed**: A0 commit 581K/29t, a1m 32K/3t, a2 23K/3t, a3 476K/34t — lean-ctx and headroom arms had trivially short commits; N=1, watch in reps
+- ⚠ **pi-headroom npm pkg found** (npmjs `pi-headroom` by mslavov) — third-party pi extension using context-hook architecture (not wire proxy); NOT the original maintainer's integration model; current a2 proxy setup is the intended approach; headroom#645 still open
+- ⚠ **lean-ctx gain harvest missing** in a1m-T-fix-r2 — XDG paths (~/.config/lean-ctx/, ~/.local/share/lean-ctx/) not landing in results; check harvest.sh before next a1m run
+- ✅ **Amendment A2** committed and arm-a1m:1.2 verified (3.7.5, bridge default-on, ctx_read→bridge) — replication arm for all remaining a1m runs. Full matrix results in INDEX.md.
+
+## State as of 2026-06-05 evening (archived)
 
 - ✅ A0 (native) rep-1 complete — banked
 - ✅ A1 (lean-ctx as-shipped default) rep-1 complete — banked, net-negative (+59% input, 3× time)

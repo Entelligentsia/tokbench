@@ -371,6 +371,146 @@ Caveats: glm vs Claude tokenizer counts differ; turn counts model-dependent;
 tier map is a judgment call; cached scenario assumes clean prefix stability.
 Projection, clearly labeled — directionally robust.
 
+## Matrix R01–R04 — 2026-06-07, first publication block (T-fix, rep 1 of matrix)
+
+All runs: base/arm :1.0 images, runtime OLLAMA_API_KEY, gates green (build=test=lint=0),
+all 8 phases stopReason=stop. Matrix order (fixed in protocol §3): A0 · a1m · a2 · a3.
+
+### A0 (R01) — tokbench-base:1.0
+
+| phase | input | turns | sec |
+|---|---:|---:|---:|
+| plan | 337,773 | 27 | 210 |
+| review-plan | 195,127 | 15 | 75 |
+| implement | 300,119 | 23 | 275 |
+| review-code | 347,079 | 26 | 98 |
+| validate | 207,644 | 16 | 230 |
+| approve | 103,091 | 9 | 42 |
+| writeback | 110,385 | 14 | 67 |
+| commit | 581,935 | 29 | 172 |
+| **TOTAL** | **2,183,153** | **159** | **1169 (19.5m)** |
+
+−2.8% vs a0v validation (2,246,787); commit phase normal at 581K — consistent with
+pilot A0's 345K/25t at an elevated level; within total-level noise floor.
+
+### a1m (R02) — tokbench-arm-a1m:1.2 (lean-ctx 3.7.5, Amendment A2)
+
+| phase | input | turns | sec |
+|---|---:|---:|---:|
+| plan | 594,668 | 35 | 355 |
+| review-plan | 321,468 | 19 | 61 |
+| implement | 459,590 | 24 | 261 |
+| review-code | 622,585 | 26 | 74 |
+| validate | 589,901 | 27 | 194 |
+| approve | 245,836 | 14 | 44 |
+| writeback | 148,698 | 14 | 104 |
+| **commit** | **32,309** | **3** | **35** |
+| **TOTAL** | **3,015,055** | **162** | **1128 (18.8m)** |
+
+**+38.1% vs R01 A0** — consistent with pilot a1m (+38%). Bridge engage-check passed.
+
+Tool adoption: 58 ctx_* calls total (38 ctx_read, 9 ctx_find, 5 ctx_ls, 5 ctx_grep,
+1 ctx_call) — **5× the pilot's 11 calls**; 3.7.5 default-on bridge + steering is
+genuinely increasing adoption. Yet overhead is unchanged: the phase-isolation/cache
+incompatibility (cep.sessions expected 0; gain metrics not harvested — XDG path miss
+in harvest.sh, fix before r3) means increased adoption yields no token benefit.
+
+**Commit anomaly**: 32K/3 turns vs R01 A0's 582K/29 turns (−94%). Also seen in a2
+(23K/3t). Hypothesis: lean-ctx-steered runs reach commit with a cleaner diff (less
+exploratory fumbling during implement/validate), leaving trivial work for the commit
+agent. N=1 per arm — watch in r3.
+
+Phase-level overhead vs A0: plan +76%, review-code +79%, validate +184%, approve
++138%. All overhead; the product's additive mode sends the full ctx_* tool schema
+every turn on top of native tools, and the steered adoption incurs envelope cost with
+zero cache payoff.
+
+### a2 (R03) — tokbench-arm-a2:1.0 + headroom sidecar
+
+| phase | input | turns | sec |
+|---|---:|---:|---:|
+| plan | 299,313 | 24 | 150 |
+| review-plan | 356,215 | 26 | 79 |
+| implement | 238,208 | 23 | 87 |
+| review-code | 448,794 | 32 | 92 |
+| validate | 396,649 | 30 | 140 |
+| approve | 108,384 | 10 | 32 |
+| writeback | 73,637 | 10 | 64 |
+| **commit** | **23,590** | **3** | **22** |
+| **TOTAL (billed, post-compression)** | **1,944,790** | **158** | **666 (11.1m)** |
+
+**−10.9% vs R01 A0 — first negative billed result in the study.**
+
+Headroom self-metrics (headroom-stats.json harvested):
+- `requests_compressed`: 132 / 158 — engage-check passes ✓
+- `avg_compression_pct`: 7.3%; `best`: 14.9% (13,736 → 11,683)
+- `total_tokens_removed`: 151,192
+- Counterfactual (billed + removed): 2,095,982
+- **Meter audit**: 1,944,790 + 151,192 = 2,095,982 = stats exactly ✓
+
+Decomposing the −238K vs A0:
+- Run-path variance: −87K (counterfactual 2,096K < A0 2,183K; this run was leaner
+  before headroom touched it)
+- **Headroom genuine**: −151K (7.21% of what would have been sent)
+
+CCR status: `ccr_entries: 0, ccr_retrievals: 0` — the one `headroom_retrieve` call
+observed in the TUI was logged but did not result in any CCR entry being stored. The
+proxy apparently decided not to store it (routing: `prefix_frozen` 17, `no_compressible_content` 9
+explain uncompressed requests). No CCR loop inflation this run; 158 turns ≈ A0's 159.
+
+**pi-headroom discovery**: an npm package (`pi-headroom` by mslavov) exists that hooks
+pi's `context` event to compress messages before each LLM call — bypassing CCR
+entirely. This is NOT the original headroom maintainer's (chopratejas) integration
+model; the wire-level proxy is the intended approach. Current a2 arm is correct.
+headroom#645 still open.
+
+Compression by strategy: smart_crusher 16, text 36, kompress 3, code_aware 10,
+search 1. Router excluded 286 tool-call messages (correct — tool results shouldn't
+be compressed into summaries).
+
+### a3 (R04) — tokbench-arm-a3:1.0 (rtk 0.42.2)
+
+| phase | input | turns | sec |
+|---|---:|---:|---:|
+| plan | 346,115 | 27 | 47 |
+| review-plan | 390,014 | 23 | 63 |
+| implement | 222,193 | 19 | 105 |
+| review-code | 263,672 | 18 | 44 |
+| validate | 231,119 | 20 | 36 |
+| approve | 158,553 | 13 | 38 |
+| writeback | 59,000 | 8 | 29 |
+| **commit** | **476,875** | **34** | **50** |
+| **TOTAL** | **2,147,541** | **162** | **412 (6.9m)** |
+
+**−1.6% vs R01 A0** — within noise floor. Implement phase errorMessage=terminated
+(transient tool error); stopReason=stop, gates green — phase completed.
+
+RTK self-metrics (rtk-history.txt + rtk-gain.json harvested):
+- 54 commands rewritten; 30.3K saved; **75.7% on touched** (pilot: 74.7% — consistent)
+- Top wins: `rtk lint eslint` 5 runs × 5.9K each = 29.3K (99.1%); `rtk git commit` 370 toks
+- **30K / 2,178K total = 1.4% of spend** — same ceiling as pilot; well below noise floor
+
+Commit blew out again (477K/34t vs a1m's 32K/3t, a2's 24K/3t) — confirms the
+commit collapse is arm-specific, not a global matrix-run phenomenon. A0 and a3 both
+show normal-to-large commits; a1m and a2 show trivially small ones. Likely mechanism:
+lean-ctx and headroom steered runs take a narrower implementation path (fewer bash/read
+exploration turns) → cleaner diff → commit agent finishes in 3 turns. Watch in r3.
+
+### First-block summary table
+
+| | A0 R01 | a1m R02 | a2 R03 | a3 R04 |
+|---|---:|---:|---:|---:|
+| billed input | 2,183,153 | 3,015,055 | 1,944,790 | 2,147,541 |
+| vs A0 | — | +38.1% | **−10.9%** | −1.6% |
+| genuine product effect | — | ~0 (cache unreachable) | **−151K (7.21%)** | −30K (1.4%) |
+| turns | 159 | 162 | 158 | 162 |
+| commit phase | 582K/29t | **32K/3t** | **23K/3t** | 477K/34t |
+
+Early verdict consistent with pilot five-way: headroom is the only arm with a
+measured negative billed result AND a verified genuine on-wire effect. a1m's +38%
+and a3's noise-floor result both reproduce. N=1 per arm for the matrix; medians
+require all 3 reps.
+
 ## a0c — 4ge on Anthropic models, MEASURED (2026-06-06 01:49–02:00 UTC, wall 11m09s)
 
 Image tokbench-arm-a0c:1.0-auth (subscription OAuth rail; pi-ai computes API-rate
