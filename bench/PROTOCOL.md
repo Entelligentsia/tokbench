@@ -73,11 +73,17 @@ All voids and reruns are published.
 ## 6. Operator protocol
 
 Interactive TUI runs, ONE session at a time, same operator throughout. Per run:
-quota-before reading → launch via documented run command (1.0 images, runtime
-OLLAMA_API_KEY) → type exactly one invocation → observe only; any prompt answered
-with its documented default → exit on completion (harvest fires) → quota-after
-reading → `docker compose stop` for a2 sidecar. Containers kept (no --rm),
-named tokbench-<arm>-<task>-r<rep>.
+
+1. **quota-before**: `bench/scripts/record-quota.sh before results/<run-dir> <pct>`
+2. **launch**: documented run command (1.0 images, runtime OLLAMA_API_KEY).
+   For a1m/a1f runs: add `-v $(pwd)/bench/docker/base/harvest.sh:/usr/local/bin/harvest.sh:ro`
+   until arm images are rebuilt with the fixed harvest (a1m/a1f case was missing; fixed 2026-06-07).
+3. **type exactly one invocation** → observe only; any prompt answered with its documented default
+4. **exit on completion** (harvest fires automatically)
+5. **quota-after**: `bench/scripts/record-quota.sh after results/<run-dir> <pct>`
+6. `docker compose stop` for a2 sidecar runs only
+
+Containers kept (no --rm), named tokbench-<arm>-<task>-r<rep>.
 
 Recording: asciinema is OPTIONAL (illustration only, not evidence). Operator
 conduct is auditable from the transcripts themselves: the pipeline is autonomous

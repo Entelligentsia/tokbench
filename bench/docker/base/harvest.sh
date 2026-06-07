@@ -46,6 +46,12 @@ case "${ARM:-a0}" in
     cp -r "$HOME/.local/share/lean-ctx" "$DEST/leanctx-share"  2>/dev/null
     lean-ctx gain --deep > "$DEST/leanctx-gain.txt" 2>&1
     [ "${CTX_CALLS:-0}" -gt 0 ] && ENGAGE="pass (${CTX_CALLS} ctx_* calls)" || ENGAGE="FAIL: no ctx_* tool calls in transcripts" ;;
+  a1m|a1f)
+    # same XDG paths as a1; gain --deep for meter audit; engage = ≥1 ctx_* call
+    cp -r "$HOME/.config/lean-ctx"      "$DEST/leanctx-config" 2>/dev/null
+    cp -r "$HOME/.local/share/lean-ctx" "$DEST/leanctx-share"  2>/dev/null
+    lean-ctx gain --deep > "$DEST/leanctx-gain.txt" 2>&1
+    [ "${CTX_CALLS:-0}" -gt 0 ] && ENGAGE="pass (${CTX_CALLS} ctx_* calls)" || ENGAGE="FAIL: no ctx_* tool calls in transcripts" ;;
   a2)
     curl -fsS "${HEADROOM_URL:-http://headroom:8787}/stats" -o "$DEST/headroom-stats.json" 2>/dev/null \
       && ENGAGE="pass" || ENGAGE="FAIL: headroom /stats unreachable or empty" ;;
