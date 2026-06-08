@@ -1,0 +1,42 @@
+# lean-ctx Activity Journal
+
+## 2026-06-08
+
+- **2026-06-08 03:10** [tool] `ctx_read` — --- AUTO CONTEXT ---
+- **2026-06-08 03:10** [tool] `ctx_read` — stack.md 86L
+- **2026-06-08 03:11** [tool] `ctx_read` — entity-model.md 88L
+- **2026-06-08 03:11** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-08 03:11** [tool] `ctx_read` — graph.test.ts 398L
+- **2026-06-08 03:11** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-08 03:11** [tool] `ctx_read` — INDEX.md 19L
+- **2026-06-08 03:11** [tool] `ctx_read` — CLAUDE.md 73L
+- **2026-06-08 03:13** [tool] `ctx_read` — supervisor.md 66L
+- **2026-06-08 03:13** [tool] `ctx_read` — PLAN.md 96L
+- **2026-06-08 03:13** [tool] `ctx_read` — TASK_PROMPT.md 47L
+- **2026-06-08 03:13** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-08 03:13** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-08 03:13** [tool] `ctx_read` — CLAUDE.md 73L
+- **2026-06-08 03:13** [tool] `ctx_read` — stack.md 86L
+- **2026-06-08 03:15** [tool] `ctx_read` — engineer.md 44L
+- **2026-06-08 03:15** [tool] `ctx_read` — PLAN.md 96L
+- **2026-06-08 03:15** [tool] `ctx_read` — stack.md 86L
+- **2026-06-08 03:15** [tool] `ctx_read` — routing.md 58L
+- **2026-06-08 03:15** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-08 03:16** [tool] `ctx_read` — CLAUDE.md 73L
+- **2026-06-08 03:17** [tool] `ctx_read` — supervisor.md 66L
+- **2026-06-08 03:17** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-08 03:17** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-08 03:18** [tool] `ctx_read` — CLAUDE.md 73L lines:45-59
+- **2026-06-08 03:25** [tool] `ctx_read` — architect.md 45L
+- **2026-06-08 03:26** [tool] `ctx_read` — stack.md 86L
+- **2026-06-08 03:26** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-08 03:26** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-08 03:26** [tool] `ctx_read` — CLAUDE.md 73L
+- **2026-06-08 03:27** [tool] `ctx_read` — collator.md 42L
+- **2026-06-08 03:27** [tool] `ctx_call` — Unknown action: refresh-kb-links. Use: register, list, post, read, status, info, handoff, sync, poll_events, diary, recall_diary, diaries, share_knowledge, receive_knowledge
+- **2026-06-08 03:27** [tool] `shell` — [BLOCKED — DO NOT RETRY] 'skill' is not in the shell allowlist. This is a permanent restriction, not a transient error.
+- **2026-06-08 03:27** [tool] `ctx_call` — Error: message required (format: key1=value1;key2=value2)
+- **2026-06-08 03:27** [tool] `ctx_read` — COLLATION_STATE.json 7L
+- **2026-06-08 03:28** [tool] `ctx_read` — MASTER_INDEX.md 51L lines:1-20
+- **2026-06-08 03:28** [tool] `shell` — preflight-gate: no preflight gates defined for phase "commit" — skipping
+- **2026-06-08 03:28** [tool] `ctx_read` — engineer.md 44L
