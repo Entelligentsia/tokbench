@@ -11,9 +11,10 @@ parallel read of all four source trees (`../lean-ctx`, `../rtk`, `../headroom`,
 
 - **forge can capture each product's *philosophy* natively, and mostly already has.**
   rtk's philosophy (command→recipe rewriting) *is* forge's identity. lean-ctx's
-  (compressed reads) is half-captured (store reads yes, source-code reads no).
-  headroom's (wire compression) is unbuilt but low-yield — and the better,
-  identity-true version is a prompt-cache flag forge already declares and never wired.
+  (compressed reads) is half-captured (store reads yes, source-code reads no) — but the
+  AST-free win there is *format* (drop JSON noise), not a code parser. headroom's (wire
+  compression) is unbuilt and low-yield. The biggest dollar lever — prompt caching — is
+  **already captured**: forge caches diligently on cache-priced rails (verified, §Q1c).
 - **The products mostly can't help a forge-cli user much** — rtk is architecturally
   capped at a ~2.5% surface; lean-ctx can only help via cold-read modes (which forge
   could do itself without paying the injected-rule tax); **headroom is the one product
@@ -59,10 +60,17 @@ audit-trailed.
   This *is* lean-ctx's philosophy applied to the KB/store, default-on.
 - **Not** captured for source code: workflows tell the agent to `Glob/Grep/Read`
   (`plan_task.md:46`) — plain Claude Code `Read`, full file, uncompressed.
-- **Native, identity-safe fix:** a `PostToolUse` (or `PreToolUse`) hook on `Read|Grep`
-  in `hooks.json:26`, backed by a new asset tool (`tools/compress-read.cjs`) returning
-  signatures/outline for large files. Additive, auditable (hooks already log), doesn't
-  touch isolation or artifacts. **Verdict: capturable natively — closes the one real hole.**
+- **The obvious "fix" carries a real cost:** signatures/outline mode = a per-language
+  parser/AST to build and maintain (this is exactly what lean-ctx owns). Given the
+  benchmark's ~26% addressable surface and run-path variance ~10× the effect, **owning an
+  AST for marginal read-compression is probably not worth it.** Downgraded.
+- **The AST-free, identity-true lever is format, not parsing.** forge already returns
+  *less* data from its store — but it returns it as **projected JSON, which is itself
+  noise** (per `06-what-models-want.md`: models don't need to parse JSON; structural
+  scaffolding is dead weight). forge controls this output format completely, so the real
+  lean-ctx-philosophy win is **denser, non-JSON store/tool returns** (tabular / minimal
+  prose) at `store-query-exec.cjs:30` — no parser, no AST, fully auditable, doesn't touch
+  isolation or artifacts. **Verdict: the gap is real but the win is format, not code-AST.**
 
 ### (b) rtk — command-layer recipe rewriting → **already forge's core identity**
 forge's whole asset layer is recipe-rewriting: deterministic CLIs (`store-cli`,
@@ -77,17 +85,24 @@ already-captured; remaining headroom marginal; load-bearing to forge identity.**
   (`packages/forge-pi-adapter/src/claude-agent-sdk-runtime.ts:204`). A decorator
   `PiRuntime` could compress the volatile prompt tail there — but it works on the
   residual ~26% and must never touch the system-prompt prefix (cache-respect).
-- **The better, identity-true win is one line away:** forge sets
-  `ModelChoice.caching = true` (`runner.ts:272`) and **never consumes it** — the SDK
-  options build no `cache_control` (`claude-agent-sdk-runtime.ts:168`). forge *claims*
-  cache-respect but doesn't implement it. On a cache-priced rail that flag is worth ~14×
-  the largest middleware effect (standing-conclusion 5). **Verdict: wire-compression
-  capturable but low-yield; activating the dead caching flag is the real native win.**
+- **forge already captures the cache lever — VERIFIED in transcripts, 2026-06-09.** Prompt
+  caching is ON: pi / the Claude Agent SDK enables it by default and forge adds cache
+  boundary markers. Proof from a0c (forge on the Anthropic rail), plan phase usage:
+  `{"input": 17, "output": 4835, "cacheRead": 179277, "cacheWrite": 19539}` — raw uncached
+  input **17 tokens**, **179,277 cache reads**, with `cacheWrite`→growing-`cacheRead` every
+  turn. (An earlier subagent read forge's TS, saw no explicit `cache_control` construction,
+  and wrongly concluded "dead flag" — it diagnosed the wrong layer; caching is the
+  runtime's default, not forge's to construct. Field names are pi's `cacheRead`/`cacheWrite`,
+  not Anthropic's raw `cache_*_input_tokens`.)
+- So wire compression is the only *un*captured headroom-style lever, and it's low-yield
+  (residual ~26%, must not touch the cached prefix). **Verdict: cache lever already
+  captured; wire-compression capturable but low-yield.**
 
-**Q1 answer:** Yes — and the two highest-value moves are forge-native and involve no
-product: **compressed source-code reads** (closes the lean-ctx gap) and **activating
-the dead `caching` flag** (the dollar lever). This is the Part-8 thesis confirmed in
-source: the governor belongs in the harness.
+**Q1 answer:** Yes — and the highest-value forge-native move is **denser (non-JSON)
+store/tool returns**, not adopting any product (see (a) note on AST cost + JSON noise).
+The cache lever — the biggest dollar lever — is **already captured** on cache-priced
+rails. This is the Part-8 thesis confirmed: the governor belongs in the harness, and
+forge already lives there.
 
 ---
 
@@ -161,18 +176,21 @@ embeddable in-process (PyO3 binding `crates/headroom-py/src/lib.rs:21`). Levers:
    (`compression_policy.rs:44`). Its risk on a priced rail is *under*-compressing, not
    cache-busting. Honest "I checked and was wrong" beat for Part 3.
 
-2. **forge's and headroom's biggest lever are the same one — prompt caching — and the
-   benchmark couldn't see it.** forge declares `caching:true` and doesn't implement it;
-   headroom has a whole cache-stabilization suite ollama can't trigger. The single
-   highest-value thing a forge-cli user can do to "save tokens" (dollars) is run on a
-   cache-priced rail with caching on — invisible in our study by design. This *reinforces*
-   the thesis: the request-metered rail measured the token-count game (where the harness
-   already wins); the dollar game is played at the cache layer, which belongs to the
-   provider and the harness, not the middleware.
+2. **forge's and headroom's biggest lever is the same one — prompt caching — and the
+   benchmark rail couldn't price it.** forge **already caches diligently** on cache-priced
+   rails (a0c plan phase: 17 raw input vs 179,277 cacheRead; pi default + forge's boundary
+   markers — VERIFIED, corrects an earlier wrong "dead flag" claim). headroom has a whole
+   cache-stabilization suite ollama can't trigger. The benchmark ran on request-metered
+   ollama-cloud where caching isn't priced, so this (already-working) win was **invisible
+   by rail choice, not absent**. This *reinforces* the thesis: the request-metered rail
+   measured the token-count game (where the harness already wins); the dollar game is
+   played at the cache layer — which forge already exploits and middleware mostly can't
+   add to.
 
 ## How this maps to the series
 
 - Q2 (product-side levers) → Part 3 "what each maintainer could do" / right-of-reply.
 - Correction 1 → Part 3 honest-correction beat (headroom & caching).
 - Q1 (forge captures the philosophies natively) + correction 2 → Parts 5, 7, 8
-  (governor-in-the-harness; the caching flag forge declares but doesn't honor).
+  (governor-in-the-harness; forge already caches diligently on cache-priced rails — the
+  benchmark rail just didn't price it).
