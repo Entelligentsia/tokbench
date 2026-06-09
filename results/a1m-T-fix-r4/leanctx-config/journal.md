@@ -1,0 +1,41 @@
+# lean-ctx Activity Journal
+
+## 2026-06-09
+
+- **2026-06-09 05:51** [tool] `shell` — --- AUTO CONTEXT ---
+- **2026-06-09 05:52** [tool] `shell` — 
+- **2026-06-09 05:52** [tool] `shell` — × Cannot resolve Forge plugin root: no CLAUDE_PLUGIN_ROOT env var and no forgeRef cache match. Run /forge:update to refresh.
+- **2026-06-09 05:54** [tool] `ctx_read` — --- AUTO CONTEXT ---
+- **2026-06-09 05:54** [tool] `ctx_read` — PLAN.md 145L
+- **2026-06-09 05:54** [tool] `ctx_read` — TASK_PROMPT.md 47L
+- **2026-06-09 05:54** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-09 05:54** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-09 05:54** [tool] `ctx_read` — CLAUDE.md 73L
+- **2026-06-09 05:54** [tool] `ctx_read` — README.md 80L
+- **2026-06-09 05:54** [tool] `ctx_read` — stack.md 86L
+- **2026-06-09 05:54** [tool] `ctx_read` — graph.test.ts 398L
+- **2026-06-09 05:55** [tool] `ctx_read` — PLAN_REVIEW_TEMPLATE.md 60L
+- **2026-06-09 05:55** [tool] `ctx_read` — engineer.md 44L
+- **2026-06-09 05:56** [tool] `ctx_read` — README.md 80L
+- **2026-06-09 05:56** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-09 05:56** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-09 05:56** [tool] `ctx_read` — graph.test.ts 398L
+- **2026-06-09 05:58** [tool] `ctx_read` — PROGRESS.md 101L lines:1-10
+- **2026-06-09 05:58** [tool] `ctx_read` — supervisor.md 66L
+- **2026-06-09 05:58** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-09 05:58** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-09 05:58** [tool] `ctx_read` — README.md 79L lines:57-71
+- **2026-06-09 06:00** [tool] `ctx_read` — qa-engineer.md 66L
+- **2026-06-09 06:00** [tool] `ctx_read` — PROGRESS.md 101L
+- **2026-06-09 06:00** [tool] `ctx_read` — PLAN.md 145L
+- **2026-06-09 06:00** [tool] `ctx_read` — TASK_PROMPT.md 47L
+- **2026-06-09 06:00** [tool] `ctx_read` — README.md 79L
+- **2026-06-09 06:00** [tool] `ctx_read` — graph.test.ts 136L
+- **2026-06-09 06:00** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-09 06:00** [tool] `ctx_read` — SPRINT_REQUIREMENTS.md 51L
+- **2026-06-09 06:02** [tool] `ctx_read` — phaseSummary.schema.json 18L
+- **2026-06-09 06:03** [tool] `ctx_read` — architect.md 45L
+- **2026-06-09 06:03** [tool] `ctx_read` — README.md 79L
+- **2026-06-09 06:03** [tool] `ctx_read` — graph.ts 113L
+- **2026-06-09 06:03** [tool] `ctx_read` — stack.md 86L
+- **2026-06-09 06:04** [tool] `ctx_read` — collator.md 42L
