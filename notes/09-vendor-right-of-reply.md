@@ -6,8 +6,8 @@ and their responses are quoted verbatim. Status as of 2026-06-09.
 | Vendor | Issue | Responded? |
 |---|---|---|
 | lean-ctx (yvgude) | [#361](https://github.com/yvgude/lean-ctx/issues/361) | **YES — substantive, 2026-06-09; confirmed + shipped fixes** |
-| rtk | [#2292](https://github.com/rtk-ai/rtk/issues/2292) | No human response (automated `wshm` triage only) |
-| headroom | [#645](https://github.com/chopratejas/headroom/issues/645) | No response (0 comments) |
+| rtk | [#2292](https://github.com/rtk-ai/rtk/issues/2292) | No human response yet; **results comment posted 2026-06-09** ([link](https://github.com/rtk-ai/rtk/issues/2292#issuecomment-4659710608)) |
+| headroom | [#645](https://github.com/chopratejas/headroom/issues/645) | No response yet; **results comment posted 2026-06-09** ([link](https://github.com/chopratejas/headroom/issues/645#issuecomment-4659710742)) |
 
 ---
 
@@ -72,4 +72,6 @@ call.
 
 ## rtk / headroom
 
-No response yet. Right-of-reply results comments still to be posted before the 17th (drafts pending).
+**Results right-of-reply comments posted 2026-06-09** (links in the table above), awaiting maintainer reply before the 17th.
+- **rtk:** worked as designed (47–79 cmds/run, 64–76% on touched); +30.1% median is run-path variance, not rtk cost (no context-injection mechanism; floor run sits at native); ~1–2.5% addressable surface (forge spend is file reads + MCP store, neither a Bash command rtk rewrites). Asked to confirm "can't add tokens," and whether new base commands can be auto-registered without recompiling.
+- **headroom:** only product with ledger-exact on-wire compression (−147–238K/run; R03/R10 reconcile exactly, R08 `total_tokens_before` off ~309K); +17.8% median lands inside the band — within-run vs between-arm + n=3 variance swamps the ~7%; turn-inflation signal (lowest tok/turn yet most turns → lossy-compression-induces-re-fetch hypothesis); cache-stabilization suite structurally invisible on our no-cache rail, so the study likely understates headroom on a cache-priced rail. Asked to confirm the framing, the turn hypothesis, and the R08 meter discrepancy.
