@@ -88,6 +88,8 @@ summary{cursor:pointer;color:var(--dim);font-size:12px}
 
   <section id="meters"><h2>The three meters never agree</h2><p class="lede">Each middleware reports savings on its own denominator at its own layer. The provider's bill is the only neutral meter — and it disagrees with all three.</p><div id="meter-cards" class="flex"></div></section>
 
+  <section id="forge"><h2>forge_compress — the harness's own compressor</h2><p class="lede">Mined from the run DB: forge compresses its own store/artifact tool output before it ever enters context — in <b>every</b> arm, including native. It out-compresses the middleware on the exact surface the middleware can't reach.</p><div id="forge-cards" class="grid cards"></div><div id="forge-tool" class="scroll" style="padding:14px;margin-top:14px"></div><div class="flex" style="margin-top:14px"><div id="forge-arm" class="scroll" style="flex:1;min-width:300px"></div><div id="forge-vs" style="flex:1;min-width:300px"></div></div></section>
+
   <section id="variance"><h2>Noise floor &amp; variance</h2><p class="lede">Across the five A0 anchors (run over several days) the native total spreads sharply, and per-phase swings are larger still — the commit phase alone moves ~40×. Single-run benchmarks cannot detect sub-5% effects; hence the A0×5 design and median-vs-band rule.</p><div id="variance-body"></div></section>
 
   <section id="voids"><h2>Voids (excluded per §5)</h2><p class="lede">Published but excluded from token comparison. None implicate the middleware — every failure is harness (#41) or provider (hang / quota).</p><div id="voids-table" class="scroll"></div></section>
@@ -110,7 +112,7 @@ const armColor=a=>cssv(ARMC[a]||'--dim');
 document.getElementById('hdrsub').textContent=`14/14 confirmatory · ${D.runs.length} runs on disk · task ${D.task} · parsed live from run-summary.tsv`;
 
 // nav
-const NAVS=[['verdict','Verdict'],['arms','Arms'],['runs','14 runs'],['phases','Phases'],['meters','Meters'],['variance','Variance'],['voids','Voids'],['context','Context']];
+const NAVS=[['verdict','Verdict'],['arms','Arms'],['runs','14 runs'],['phases','Phases'],['meters','Meters'],['forge','forge_compress'],['variance','Variance'],['voids','Voids'],['context','Context']];
 document.getElementById('nav').append(...NAVS.map(([h,t])=>el('a',{href:'#'+h},t)));
 
 // ---- verdict ----
@@ -237,6 +239,50 @@ for(const a of ['a2','a3','a1m']){
   mi.rows(r).forEach(([lab,val,cl])=>c.append(el('div',{class:'vs'},el('span',{class:'note',style:'margin:0'},lab),el('b',{class:cl||'',style:'font-family:var(--mono)'},val))));
   c.append(el('div',{class:'note',style:'margin-top:10px;font-style:italic'},mi.foot));
   mh.append(c);
+}
+
+// ---- forge_compress ----
+const FC=D.forge_compress;
+if(FC){
+  const fcg=document.getElementById('forge-cards');
+  const ov=FC.overall;
+  fcg.append(el('div',{class:'card'},el('h3',{},'store I/O compressed'),el('div',{class:'big'},ov.saved_pct+'%'),el('div',{class:'note',html:`${k(ov.before)} → ${k(ov.after)} · −${k(ov.saved)} across matrix`})));
+  const perRun=Math.round(FC.by_arm.reduce((s,a)=>s+a.saved_per_run,0)/FC.by_arm.length);
+  fcg.append(el('div',{class:'card'},el('h3',{},'saved per run'),el('div',{class:'big'},'~'+k(perRun)),el('div',{class:'note'},'in EVERY arm, incl. native — a harness constant')));
+  const fVl=FC.vs_leanctx; const ratio=(fVl.reduce((s,x)=>s+x.forge,0)/fVl.reduce((s,x)=>s+x.leanctx,0)).toFixed(1);
+  fcg.append(el('div',{class:'card'},el('h3',{html:`forge vs <span style="color:${armColor('a1m')}">lean-ctx</span>`}),el('div',{class:'big'},ratio+'×'),el('div',{class:'note'},'forge out-saves lean-ctx/run, same metric, on the MCP surface ctx_* can\'t reach')));
+
+  // per-tool bars
+  const ft=el('table');const ftb=el('tbody');
+  ft.append(el('thead',{},el('tr',{},el('th',{},'forge tool'),el('th',{class:'num'},'calls'),el('th',{class:'num'},'before→after'),el('th',{},'% saved'))));
+  const fmax=Math.max(...FC.by_tool.map(t=>t.saved_pct));
+  FC.by_tool.forEach(t=>{
+    const bw=el('div',{class:'barwrap',style:'width:min(420px,40vw)'});
+    bw.append(el('div',{class:'bar',style:`width:${t.saved_pct}%;background:var(--a2)`}));
+    ftb.append(el('tr',{},el('td',{class:'mono'},t.tool),el('td',{class:'num'},fmt(t.calls)),el('td',{class:'num',style:'color:var(--dim)'},`${k(t.before)}→${k(t.after)}`),el('td',{},el('div',{style:'display:flex;gap:8px;align-items:center'},el('b',{class:'mono'},t.saved_pct+'%'),bw))));
+  });
+  ft.append(ftb);document.getElementById('forge-tool').append(ft);
+
+  // per-arm (harness constant)
+  const fa=el('table');const fab=el('tbody');
+  fa.append(el('thead',{},el('tr',{},el('th',{},'arm'),el('th',{class:'num'},'saved/run'),el('th',{class:'num'},'avg %'))));
+  FC.by_arm.forEach(a=>fab.append(el('tr',{},el('td',{html:`<span class=swatch style="background:${armColor(a.arm)}"></span>${D.arm_label[a.arm]||a.arm}`}),el('td',{class:'num'},fmt(a.saved_per_run)),el('td',{class:'num'},a.avg_pct+'%'))));
+  fa.append(fab);
+  const faWrap=document.getElementById('forge-arm');
+  faWrap.append(el('div',{class:'note',style:'padding:6px 4px'},'Harness constant — arm-independent'));faWrap.append(fa);
+
+  // forge vs lean-ctx bars (a1m runs)
+  const fv=document.getElementById('forge-vs');
+  fv.append(el('div',{class:'note',style:'padding:6px 4px'},'Same metric, a1m runs: forge_compress vs lean-ctx ctx_* saved'));
+  const vmax=Math.max(...fVl.flatMap(x=>[x.forge,x.leanctx]));
+  fVl.forEach(x=>{
+    const row=el('div',{style:'margin:8px 0'});
+    row.append(el('div',{class:'note',style:'margin:0 0 3px'},x.run+`  (forge ${(x.forge/x.leanctx).toFixed(1)}×)`));
+    const mk=(v,c,lab)=>{const w=el('div',{class:'barwrap',style:'width:100%;margin:2px 0'});w.append(el('div',{class:'bar',style:`width:${v/vmax*100}%;background:${c}`}));return el('div',{style:'display:flex;gap:8px;align-items:center'},el('span',{class:'note mono',style:'margin:0;width:64px'},lab+' '+k(v)),w);};
+    row.append(mk(x.forge,cssv('--a2'),'forge'));
+    row.append(mk(x.leanctx,armColor('a1m'),'lean'));
+    fv.append(row);
+  });
 }
 
 // ---- variance ----

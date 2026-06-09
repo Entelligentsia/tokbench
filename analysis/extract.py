@@ -173,10 +173,35 @@ for ph in PHASE_ORDER:
         if vals:
             phase_cmp[ph][arm] = dict(median=round(median(vals)), min=min(vals), max=max(vals), n=len(vals))
 
+# forge_compress aggregates from the SQLite store (db/tokbench.db), if present
+def forge_compress_from_db():
+    import sqlite3
+    dbp = os.path.join(ROOT, "db", "tokbench.db")
+    if not os.path.exists(dbp): return None
+    con = sqlite3.connect(dbp); cur = con.cursor()
+    def q(sql): return cur.execute(sql).fetchall()
+    MX = "comp_source='forge' AND r.class='matrix'"
+    ov = q(f"SELECT COUNT(*),SUM(comp_before),SUM(comp_after) FROM tool_results tr JOIN runs r USING(run_id) WHERE {MX}")[0]
+    by_tool = [dict(tool=t,calls=c,before=b,after=a,saved_pct=round(100*(b-a)/b,1))
+        for t,c,b,a in q(f"SELECT comp_subtool,COUNT(*),SUM(comp_before),SUM(comp_after) FROM tool_results tr JOIN runs r USING(run_id) WHERE {MX} GROUP BY comp_subtool ORDER BY SUM(comp_before) DESC")]
+    by_arm = [dict(arm=arm,runs=rn,saved=s,saved_per_run=round(s/rn),avg_pct=round(p,1))
+        for arm,rn,s,p in q(f"SELECT r.arm,COUNT(DISTINCT r.run_id),SUM(comp_before-comp_after),AVG(comp_saved_pct) FROM tool_results tr JOIN runs r USING(run_id) WHERE {MX} GROUP BY r.arm")]
+    vs = [dict(run=run, forge=f, leanctx=l) for run,f,l in q(
+        "SELECT r.run_id,SUM(CASE WHEN comp_source='forge' THEN comp_before-comp_after ELSE 0 END),"
+        "SUM(CASE WHEN comp_source='lean-ctx' THEN comp_before-comp_after ELSE 0 END) "
+        "FROM tool_results tr JOIN runs r USING(run_id) WHERE r.arm='a1m' AND r.class='matrix' GROUP BY r.run_id ORDER BY r.run_id")]
+    by_phase = [dict(phase=ph,saved=s,avg_pct=round(p,1)) for ph,s,p in q(
+        f"SELECT phase,SUM(comp_before-comp_after),AVG(comp_saved_pct) FROM tool_results tr JOIN runs r USING(run_id) WHERE {MX} GROUP BY phase ORDER BY SUM(comp_before-comp_after) DESC")]
+    con.close()
+    calls,before,after = ov
+    return dict(overall=dict(calls=calls,before=before,after=after,saved=before-after,saved_pct=round(100*(before-after)/before,1)),
+        by_tool=by_tool, by_arm=by_arm, vs_leanctx=vs, by_phase=by_phase)
+
 out = dict(
     generated_note="parsed from results/*/run-summary.tsv — no hand-entered numbers",
     task="CART-S01-T01", phase_order=PHASE_ORDER, arm_label=ARM_LABEL,
     runs=runs, aggregates=agg, phase_compare=phase_cmp,
+    forge_compress=forge_compress_from_db(),
 )
 json.dump(out, open(os.path.join(os.path.dirname(__file__),"data.json"),"w"), indent=2)
 print(f"runs parsed: {len(runs)} (matrix={len(matrix)}, void={sum(1 for r in runs if r['cls']=='void')}, other={sum(1 for r in runs if r['cls'] not in ('matrix','void'))})")
